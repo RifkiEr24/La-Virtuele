@@ -121,10 +121,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR/'static/'
 
 WEBPACK_LOADER = {
   'DEFAULT': {
-    'CACHE': DEBUG,
+    'CACHE': False,
     'BUNDLE_DIR_NAME': '/bundles/',
     'STATS_FILE': os.path.join(FRONTEND_DIR, 'webpack-stats.json'),
   }

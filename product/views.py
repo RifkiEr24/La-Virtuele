@@ -1,11 +1,11 @@
-from product.models import Cart, Product, ProductCart
+from product.models import Cart, Gallery, Product, ProductCart
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework import authentication, permissions
-from product.serializers import CartSerializer, ProductSerializer
+from product.serializers import CartSerializer, GallerySerializer, ProductSerializer
 from rest_framework import status
 from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect
@@ -54,6 +54,12 @@ class ProductDetail(APIView):
         product = self.get_object(slug)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class GalleryList(APIView):
+    def get(self, request):
+        gallery = Gallery.objects.all().order_by('product')
+        serialize = GallerySerializer(gallery, many=True)
+        return Response(serialize.data)
 
 class Carts(APIView):
     def get(self, request, user=None):

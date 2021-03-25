@@ -3,6 +3,7 @@ from django.utils.text import slugify
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.dispatch import receiver
+import os
 
 SIZE_CHOICES = (
     ('S', 'Small'),
@@ -36,6 +37,34 @@ def product_post_save(sender, instance, created, **kwargs):
     if product_carts.exists():
         for product_cart in product_carts:
             product_cart.save()
+            
+class Gallery(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')
+    height = models.IntegerField(blank=True, null=True)
+    width = models.IntegerField(blank=True, null=True)
+    image = models.ImageField(upload_to='media/', height_field='height', width_field='width')
+
+    def __str__(self):
+        return f'{self.product.slug}-{self.width}x{self.height}'
+
+@receiver(models.signals.post_delete, sender=Gallery)
+def auto_delete_gallery_image_on_delete(sender, instance, **kwargs):
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
+
+@receiver(models.signals.pre_save, sender=Gallery)
+def auto_delete_gallery_image_on_change(sender, instance, **kwargs):
+    if not instance.pk:
+        return False
+    try:
+        old_file = sender.objects.get(pk=instance.pk).image
+    except sender.DoesNotExist:
+        return False
+    new_file = instance.image
+    if not old_file == new_file:
+        if os.path.isfile(old_file.path):
+            os.remove(old_file.path)
 
 class ProductCart(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True, related_name='product_cart')
