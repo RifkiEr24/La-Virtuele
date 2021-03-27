@@ -32,7 +32,15 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'webpack_loader',
+
+    'product',
 ]
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+#     ]
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -113,11 +121,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR/'static/'
 
 WEBPACK_LOADER = {
   'DEFAULT': {
-    'CACHE': DEBUG,
-    'BUNDLE_DIR_NAME': '/bundles/',  # must end with slash
+    'CACHE': False,
+    'BUNDLE_DIR_NAME': '/bundles/',
     'STATS_FILE': os.path.join(FRONTEND_DIR, 'webpack-stats.json'),
   }
 }
