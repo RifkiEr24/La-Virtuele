@@ -15,7 +15,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(ProductCart)
 class ProductCartAdmin(admin.ModelAdmin):
-    readonly_fields = ('total',)
+    readonly_fields = ('subtotal',)
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):

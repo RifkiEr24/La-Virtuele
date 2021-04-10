@@ -72,7 +72,7 @@ class ProductCart(models.Model):
     qty = models.PositiveSmallIntegerField(verbose_name='Quantity', default=1)
     size = models.CharField(choices=SIZE_CHOICES, max_length=1)
     checked_out = models.BooleanField(default=False)
-    total = models.PositiveIntegerField(null=True, blank=True, default=0)
+    subtotal = models.PositiveIntegerField(null=True, blank=True, default=0)
 
     def __str__(self, *args, **kwargs):
         return f'{self.product} {self.size} {self.qty}'

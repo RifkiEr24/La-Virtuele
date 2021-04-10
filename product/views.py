@@ -1,6 +1,6 @@
+from django.http.response import JsonResponse
 from product.models import Cart, Gallery, Product, ProductCart
 from django.contrib.auth.models import User
-from rest_framework import routers, serializers, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, ParseError
@@ -8,8 +8,10 @@ from rest_framework import authentication, permissions
 from product.serializers import CartSerializer, GallerySerializer, ProductSerializer
 from rest_framework import status
 from django.http import Http404, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 
 class Products(APIView):
     def get(self, request):
@@ -62,16 +64,18 @@ class GalleryList(APIView):
         return Response(serialize.data)
 
 class Carts(APIView):
-    def get(self, request, user=None):
-        if user:
-            carts = [cart for cart in Cart.objects.filter(user__username=user)]
-        else:
-            carts = [cart for cart in Cart.objects.all()]
+    def get(self, request):
+        user = request.user
+        if not user.is_authenticated:
+            return Response({'Login Required': 'API call is failed as client are not logged in'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        carts = [cart for cart in Cart.objects.filter(user__username=user)]
         serializer = CartSerializer(carts, many=True)
         return Response(serializer.data)
 
 class AddToCart(APIView):
-    def get(self, request, slug, size):
+    def post(self, request, slug, size):
+        if not request.user.is_authenticated:
+            return Response({'Login Required': 'API call is failed as client are not logged in'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         product = get_object_or_404(Product, slug=slug)
         product_cart, created = ProductCart.objects.get_or_create(user=request.user, product=product, checked_out=False, size=size)
         cart_qs = Cart.objects.filter(user=request.user, checked_out=False)
@@ -97,7 +101,9 @@ class RemoveFromCart(APIView):
         except ProductCart.DoesNotExist:
             raise ParseError('Product did not exists in cart')
 
-    def get(self, request, slug, size):
+    def post(self, request, slug, size):
+        if not request.user.is_authenticated:
+            return Response({'Login Required': 'API call is failed as client are not logged in'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         product_cart = self.get_product(request, slug, size)
         cart = Cart.objects.get(user=request.user, checked_out=False)
         if product_cart.qty > 1:
@@ -119,7 +125,9 @@ class Checkout(APIView):
         except Cart.DoesNotExist:
             raise ParseError('User current cart is empty')
 
-    def get(self, request):
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return Response({'Login Required': 'API call is failed as client are not logged in'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         cart = self.get_cart(request)
         cart.checked_out = True
 
