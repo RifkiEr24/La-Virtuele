@@ -64,18 +64,18 @@ class GalleryList(APIView):
         return Response(serialize.data)
 
 class Carts(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request):
         user = request.user
-        if not user.is_authenticated:
-            return Response({'Login Required': 'API call is failed as client are not logged in'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         carts = [cart for cart in Cart.objects.filter(user__username=user)]
         serializer = CartSerializer(carts, many=True)
         return Response(serializer.data)
 
 class AddToCart(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, slug, size):
-        if not request.user.is_authenticated:
-            return Response({'Login Required': 'API call is failed as client are not logged in'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         product = get_object_or_404(Product, slug=slug)
         product_cart, created = ProductCart.objects.get_or_create(user=request.user, product=product, checked_out=False, size=size)
         cart_qs = Cart.objects.filter(user=request.user, checked_out=False)
@@ -95,6 +95,8 @@ class AddToCart(APIView):
         return Response(serializer.data)
 
 class RemoveFromCart(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def get_product(self, request, slug, size):
         try:
             return ProductCart.objects.get(product__slug=slug, user=request.user, size=size, checked_out=False)
@@ -102,8 +104,6 @@ class RemoveFromCart(APIView):
             raise ParseError('Product did not exists in cart')
 
     def post(self, request, slug, size):
-        if not request.user.is_authenticated:
-            return Response({'Login Required': 'API call is failed as client are not logged in'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         product_cart = self.get_product(request, slug, size)
         cart = Cart.objects.get(user=request.user, checked_out=False)
         if product_cart.qty > 1:
@@ -119,6 +119,8 @@ class RemoveFromCart(APIView):
 
 
 class Checkout(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def get_cart(self, request):
         try:
             return Cart.objects.get(user=request.user, checked_out=False)
@@ -126,8 +128,6 @@ class Checkout(APIView):
             raise ParseError('User current cart is empty')
 
     def post(self, request):
-        if not request.user.is_authenticated:
-            return Response({'Login Required': 'API call is failed as client are not logged in'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         cart = self.get_cart(request)
         cart.checked_out = True
 
