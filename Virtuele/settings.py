@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     'product',
+    'user',
 ]
 
 REST_FRAMEWORK = {
@@ -132,3 +133,5 @@ WEBPACK_LOADER = {
     'STATS_FILE': os.path.join(FRONTEND_DIR, 'webpack-stats.json'),
   }
 }
+
+AUTH_USER_MODEL = 'user.User'
