@@ -1,4 +1,4 @@
-from django.http.response import JsonResponse
+from rest_framework_simplejwt.exceptions import TokenError
 from product.models import Cart, Gallery, Product, ProductCart
 from django.contrib.auth.models import User
 from rest_framework.views import APIView
@@ -9,11 +9,12 @@ from product.serializers import CartSerializer, GallerySerializer, ProductSerial
 from rest_framework import status
 from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
-from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from user.permissions import IsActive, IsStaffOrReadOnly
+from rest_framework_simplejwt.tokens import AccessToken
 
 class Products(APIView):
+    permission_classes = [IsStaffOrReadOnly]
     def get(self, request):
         products = [product for product in Product.objects.all()]
         serializer = ProductSerializer(products, many=True)
@@ -44,12 +45,15 @@ class ProductDetail(APIView):
         serializer = ProductSerializer(product)
         return Response(serializer.data)
 
-    def put(self, request, slug):
+    def patch(self, request, slug):
         product = self.get_object(slug)
-        serializer = ProductSerializer(product, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+        try:
+            serializer = ProductSerializer(product, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+        except ValidationError:
+            return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, slug):
@@ -64,7 +68,7 @@ class GalleryList(APIView):
         return Response(serialize.data)
 
 class Carts(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsActive]
 
     def get(self, request):
         user = request.user
@@ -73,7 +77,7 @@ class Carts(APIView):
         return Response(serializer.data)
 
 class AddToCart(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsActive]
 
     def post(self, request, slug, size):
         product = get_object_or_404(Product, slug=slug)
@@ -95,7 +99,7 @@ class AddToCart(APIView):
         return Response(serializer.data)
 
 class RemoveFromCart(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsActive]
 
     def get_product(self, request, slug, size):
         try:
@@ -119,7 +123,7 @@ class RemoveFromCart(APIView):
 
 
 class Checkout(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsActive]
 
     def get_cart(self, request):
         try:

@@ -12,13 +12,13 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'first_name', 'last_name', 'avatar', 'is_superuser', 'is_staff'),
+            'fields': ('email', 'password1', 'password2', 'first_name', 'last_name', 'avatar', 'is_superuser'),
         }),
     )
     readonly_fields = ('width', 'height')
     list_filter = ()
     filter_horizontal = ()
     search_fields = ('email',)
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_superuser', 'is_active')
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_superuser', 'is_active', 'is_staff')
 
 admin.site.unregister(Group)

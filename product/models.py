@@ -1,9 +1,11 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.dispatch import receiver
 import os
+import random
 
 SIZE_CHOICES = (
     ('S', 'Small'),
@@ -19,7 +21,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     product = models.CharField(verbose_name='Product Name', max_length=255)
-    slug = models.CharField(null=True, editable=False, max_length=255)
+    slug = models.CharField(null=True, editable=False, max_length=255, unique=True)
     price = models.FloatField()
     category = models.ManyToManyField(Category, related_name='product')
     is_featured = models.BooleanField(default=False)
@@ -37,6 +39,12 @@ def product_post_save(sender, instance, created, **kwargs):
     if product_carts.exists():
         for product_cart in product_carts:
             product_cart.save()
+
+@receiver(models.signals.pre_save, sender=Product)
+def product_pre_save(sender, instance, **kwargs):
+    check_slug = Product.objects.filter(slug=instance.slug)
+    if check_slug and instance not in check_slug:
+        instance.slug = f"{instance.slug}-{random.randint(0, 100000)}"
             
 class Gallery(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')

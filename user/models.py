@@ -22,7 +22,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
-    username = models.CharField(max_length=255, unique=True)
+    username = models.CharField(max_length=255)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255, null=True, blank=True)
     height = models.IntegerField(blank=True, null=True)
@@ -32,7 +32,7 @@ class User(AbstractBaseUser):
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     objects = UserManager()
     
@@ -75,4 +75,9 @@ def auto_delete_user_avatar_on_change(sender, instance, **kwargs):
                 os.remove(old_file.path)
         except ValueError:
             return False
-    
+
+@receiver(models.signals.post_save, sender=User)
+def auto_set_username(sender, instance, created, **kwargs):
+    if created or not instance.username:
+        instance.username = f'{instance.first_name}_{instance.last_name}'.lower()
+        instance.save()

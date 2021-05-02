@@ -3,7 +3,7 @@ from .models import Gallery, Product, Category, ProductCart, Cart
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('product', 'slug', 'price', 'is_featured')
 
 @admin.register(Gallery)
 class GalleryAdmin(admin.ModelAdmin):
