@@ -8,29 +8,32 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@fortawesome/vue-fontawesome": "^3.0.0-3",
-    "@headlessui/vue": "^0.3.0",
     "@tailwindcss/postcss7-compat": "^2.0.2",
-    "alpinejs": "^2.8.1",
     "autoprefixer": "^9",
     "core-js": "^3.6.5",
     "postcss": "^7",
+    "register-service-worker": "^1.7.1",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
-    "vue": "^3.0.0",
-    "vue-router": "^4.0.0-0",
-    "vue3-carousel": "^0.1.12"
+    "vue": "^2.6.11",
+    "vue-page-transition": "^0.2.2",
+    "vue-router": "^3.2.0",
+    "vue-slick-carousel": "^1.0.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-router": "^4.5.11",
+    "@vue/cli-plugin-pwa": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
-    "@vue/compiler-sfc": "^3.0.0",
+    "@vue/eslint-config-airbnb": "^5.0.2",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^7.0.0-0",
-    "vue-cli-plugin-tailwind": "~2.0.6",
-    "webpack-bundle-tracker": "^0.4.3"
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "node-sass": "^4.12.0",
+    "sass-loader": "^8.0.2",
+    "vue-cli-plugin-tailwind": "^2.0.6",
+    "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {
     "root": true,
@@ -38,7 +41,7 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/vue3-essential",
+      "plugin:vue/essential",
       "eslint:recommended"
     ],
     "parserOptions": {
