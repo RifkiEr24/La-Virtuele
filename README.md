@@ -14,15 +14,27 @@ You only need to do this once.<br>
 
 __Running The Development Server__
 
-Run the shell script.
+This project has a completely separated client and server app.
+
+__Run Django Server__
+
+The best way to run it, is using the shell script.<br>
+It may be slow since it is always installing the requirements and check for migrations.
+
 ```
-vueserver.sh
+backend/djserver.sh
 ```
 
-And in another terminal
+__Run Vue App__
+
+The first thing you need to do is CD to the frontend folder, then run npm install.<br>
+If the installation is successfully completed, you can run npm run serve to start the app.
 ```
-djserver.sh
+cd frontend
+npm install
+npm run server
 ```
+
 
 ### Contributors
 * **Muhammad Rifki Erlangga** - [Github](https://github.com/RifkiEr24)
