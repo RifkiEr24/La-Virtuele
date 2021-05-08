@@ -7,19 +7,3 @@ html, body {
 .header{
   font-family: 'Bebas Neue', cursive;
 }
-.carousel__prev {
-    top: unset;
-    left: unset;
-    right:80px;
-    transform: translate(0, 0);
-    bottom: 20px;
-  }
-
-  .carousel__next {
-    top: unset;
-    right: 0;
-    transform: translate(0, 0);
-    right: 20px;
-    bottom: 20px;
-  }
-  
