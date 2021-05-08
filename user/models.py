@@ -4,17 +4,17 @@ from django.dispatch import receiver
 import os
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, username, first_name, password=None, **kwargs):
+    def create_user(self, email, username, first_name, last_name=None, password=None, **kwargs):
         if not email or not username or not first_name:
             raise ValueError("Data is not complete")        
 
-        user = self.model(email = email, username = username, first_name = first_name, **kwargs)
+        user = self.model(email = email, username = username, first_name = first_name, last_name = last_name, **kwargs)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, first_name, password):
-        user = self.create_user(email = email, username = username, first_name = first_name, password = password)
+    def create_superuser(self, email, username, first_name, last_name, password):
+        user = self.create_user(email = email, username = username, first_name = first_name, last_name = last_name, password = password)
         user.is_superuser = True
         user.is_active = True
         user.save(using=self._db)
@@ -78,6 +78,6 @@ def auto_delete_user_avatar_on_change(sender, instance, **kwargs):
 
 @receiver(models.signals.post_save, sender=User)
 def auto_set_username(sender, instance, created, **kwargs):
-    if created or not instance.username:
+    if not instance.username:
         instance.username = f'{instance.first_name}_{instance.last_name}'.lower()
         instance.save()

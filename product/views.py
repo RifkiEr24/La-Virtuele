@@ -1,17 +1,12 @@
-from rest_framework_simplejwt.exceptions import TokenError
 from product.models import Cart, Gallery, Product, ProductCart
-from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, ParseError
-from rest_framework import authentication, permissions
-from product.serializers import CartSerializer, GallerySerializer, ProductSerializer
+from product.serializers import CartSerializer, CreateProductSerializer, GallerySerializer, ProductSerializer
 from rest_framework import status
-from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
 from user.permissions import IsActive, IsStaffOrReadOnly
-from rest_framework_simplejwt.tokens import AccessToken
+from django.http import Http404
 
 class Products(APIView):
     permission_classes = [IsStaffOrReadOnly]
@@ -21,10 +16,14 @@ class Products(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = ProductSerializer(data=request.data)
+        serializer = CreateProductSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                {'detail': 'Product successfully created',
+                'id': serializer.data['id'],
+                'slug': serializer.data['slug']}, 
+                status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class FeaturedProducts(APIView):
@@ -64,8 +63,21 @@ class ProductDetail(APIView):
 class GalleryList(APIView):
     def get(self, request):
         gallery = Gallery.objects.all().order_by('product')
+
+        if request.GET.get('featured') == 'true':
+            gallery = gallery.filter(product__is_featured=True)
+
+        if request.GET.get('product_slug'):
+            gallery = gallery.filter(product__slug=request.GET.get('product_slug'))
+        
+        if not gallery:
+            '''
+            Return early with no content (204) if no queryset found
+            '''
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         serialize = GallerySerializer(gallery, many=True)
-        return Response(serialize.data)
+        return Response(serialize.data, status=status.HTTP_200_OK)
 
 class Carts(APIView):
     permission_classes = [IsActive]
@@ -101,14 +113,22 @@ class AddToCart(APIView):
 class RemoveFromCart(APIView):
     permission_classes = [IsActive]
 
-    def get_product(self, request, slug, size):
+    def get_product(self, user, slug, size):
         try:
-            return ProductCart.objects.get(product__slug=slug, user=request.user, size=size, checked_out=False)
+            return ProductCart.objects.get(product__slug=slug, user=user, size=size, checked_out=False)
         except ProductCart.DoesNotExist:
             raise ParseError('Product did not exists in cart')
 
     def post(self, request, slug, size):
-        product_cart = self.get_product(request, slug, size)
+        user = request.user
+
+        try:
+            product_cart = self.get_product(user, slug, size)
+        except ParseError:
+            return Response(
+                {'detail': f'Trying to remove non existing product from {user.username} cart'},
+                status=status.HTTP_400_BAD_REQUEST)
+
         cart = Cart.objects.get(user=request.user, checked_out=False)
         if product_cart.qty > 1:
             product_cart.qty -= 1
@@ -123,6 +143,11 @@ class RemoveFromCart(APIView):
 
 
 class Checkout(APIView):
+    '''
+    Dummy checkout API
+    No payment gateway implemented
+    Expecting to use midtrans
+    '''
     permission_classes = [IsActive]
 
     def get_cart(self, request):
