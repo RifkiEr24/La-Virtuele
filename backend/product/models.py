@@ -13,6 +13,13 @@ SIZE_CHOICES = (
     ('L', 'Large'),
 )
 
+IMAGE_TYPE_CHOICES = (
+    ('O', 'Other'),
+    ('PF', 'Product Front'),
+    ('PB', 'Product Back'),
+    ('M', 'With Model(s)'),
+)
+
 class Category(models.Model):
     category = models.CharField(max_length=255)
 
@@ -48,12 +55,13 @@ def product_pre_save(sender, instance, **kwargs):
             
 class Gallery(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')
+    image_type = models.TextField(choices=IMAGE_TYPE_CHOICES, default=IMAGE_TYPE_CHOICES[0][0], max_length=2)
     height = models.IntegerField(blank=True, null=True)
     width = models.IntegerField(blank=True, null=True)
     image = models.ImageField(upload_to='media/', height_field='height', width_field='width')
 
     def __str__(self):
-        return f'{self.product.slug}-{self.width}x{self.height}'
+        return f'{self.image_type}-{self.product.slug}-{self.width}x{self.height}'
 
 @receiver(models.signals.post_delete, sender=Gallery)
 def auto_delete_gallery_image_on_delete(sender, instance, **kwargs):
