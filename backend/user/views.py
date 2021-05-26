@@ -3,8 +3,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from user.serializers import VirtueleTokenObtainPairSerializer
 
-class CustomTokenObtainPairView(TokenObtainPairView):
+class VirtueleTokenObtainPairView(TokenObtainPairView):
+    serializer_class = VirtueleTokenObtainPairSerializer
+    
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
@@ -15,7 +18,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
-class CustomTokenRefreshView(TokenRefreshView):
+class VirtueleTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
