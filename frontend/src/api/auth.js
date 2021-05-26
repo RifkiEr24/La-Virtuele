@@ -29,6 +29,12 @@ const loginUser = (username, password) => {
     })
 };
 
+const logoutUser = () => {
+  window.localStorage.removeItem(ACCESS_TOKEN);
+  window.localStorage.removeItem(REFRESH_TOKEN);
+  authRequest.defaults.headers.Authorization = '';
+}
+
 const refreshToken = () => {
   const refreshBody = {
     refresh: window.localStorage.getItem(REFRESH_TOKEN)
@@ -67,12 +73,6 @@ const authRequest = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
-const logoutUser = () => {
-  window.localStorage.removeItem(ACCESS_TOKEN);
-  window.localStorage.removeItem(REFRESH_TOKEN);
-  authRequest.defaults.headers.Authorization = '';
-}
 
 const isCorrectRefreshError = (status) => status === 401;
 
