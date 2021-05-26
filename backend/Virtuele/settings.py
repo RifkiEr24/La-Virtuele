@@ -43,7 +43,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    # 'user.authentication.JWTMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -146,7 +145,10 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
-    "http://127.0.0.1:8000"
+    "http://127.0.0.1:8080",
+
+    # Important change this line to the frontend domain in production
+    "https://frontend-domain.com",
 ]
 CORS_ALLOWED_ALL_ORIGINS = True
 

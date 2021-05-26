@@ -31,6 +31,7 @@ class Product(models.Model):
     slug = models.CharField(null=True, editable=False, max_length=255, unique=True)
     price = models.FloatField()
     category = models.ManyToManyField(Category, related_name='product')
+    material = models.TextField(max_length=255, default="")
     is_featured = models.BooleanField(default=False)
 
     def __str__(self, *args, **kwargs):
