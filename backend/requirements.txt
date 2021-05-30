@@ -56,5 +56,4 @@ social-auth-core==4.1.0
 sqlparse==0.4.1
 uritemplate==3.0.1
 urllib3==1.25.8
-virtualenv==20.4.2
 webencodings==0.5.1

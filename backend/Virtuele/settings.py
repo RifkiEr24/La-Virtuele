@@ -18,7 +18,7 @@ SECRET_KEY = '_p^pig=!+75d8x_1+#b5-w_ils9i4wpp7&)3l5dt-jwpq8_!x2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -123,6 +123,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR/'static/'
+MEDIA_ROOT = BASE_DIR/'media/'
 
 WEBPACK_LOADER = {
   'DEFAULT': {
