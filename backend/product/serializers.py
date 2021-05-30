@@ -13,9 +13,11 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class GallerySerializer(serializers.ModelSerializer):
     product = serializers.StringRelatedField()
+    type = serializers.CharField(source='get_image_type_display')
+    type_code = serializers.CharField(source='image_type')
     class Meta:
         model = Gallery
-        fields = ('image', 'width', 'height', 'product')
+        fields = ('image', 'width', 'height', 'product', 'type', 'type_code')
 
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True, many=True)

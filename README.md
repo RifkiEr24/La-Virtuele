@@ -32,7 +32,7 @@ If the installation is successfully completed, you can run npm run serve to star
 ```
 cd frontend
 npm install
-npm run server
+npm run serve
 ```
 
 
