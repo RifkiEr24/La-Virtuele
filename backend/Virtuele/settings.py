@@ -5,20 +5,20 @@ from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR/'templates/'
-FRONTEND_DIR = BASE_DIR/'frontend/'
-
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '_p^pig=!+75d8x_1+#b5-w_ils9i4wpp7&)3l5dt-jwpq8_!x2'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'changemeonproduction')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(int(os.environ.get('DEBUG', 1)))
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
+ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS')
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS.extend(ALLOWED_HOSTS_ENV.split(','))
 
 
 # Application definition
@@ -124,14 +124,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR/'static/'
 MEDIA_ROOT = BASE_DIR/'media/'
-
-WEBPACK_LOADER = {
-  'DEFAULT': {
-    'CACHE': False,
-    'BUNDLE_DIR_NAME': '/bundles/',
-    'STATS_FILE': os.path.join(FRONTEND_DIR, 'webpack-stats.json'),
-  }
-}
 
 AUTH_USER_MODEL = 'user.User'
 
