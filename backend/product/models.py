@@ -59,7 +59,7 @@ class Gallery(models.Model):
     image_type = models.TextField(choices=IMAGE_TYPE_CHOICES, default=IMAGE_TYPE_CHOICES[0][0], max_length=2)
     height = models.IntegerField(blank=True, null=True)
     width = models.IntegerField(blank=True, null=True)
-    image = models.ImageField(upload_to='media/', height_field='height', width_field='width')
+    image = models.ImageField(upload_to='', height_field='height', width_field='width')
 
     def __str__(self):
         return f'{self.image_type}-{self.product.slug}-{self.width}x{self.height}'
@@ -95,7 +95,7 @@ class ProductCart(models.Model):
         return f'{self.product} {self.size} {self.qty}'
     
     def save(self, *args, **kwargs):
-        self.total = int(self.product.price) * int(self.qty)
+        self.subtotal = int(self.product.price) * int(self.qty)
         return super(ProductCart, self).save(*args, **kwargs)
 
 @receiver(models.signals.post_save, sender=ProductCart)
@@ -123,7 +123,7 @@ class Cart(models.Model):
 def cart_post_save(sender, instance, created, **kwargs):
     cart_total = 0
     for product in instance.products.all():
-        cart_total += product.total
+        cart_total += product.subtotal
 
     if not cart_total == instance.total:
         instance.total = cart_total

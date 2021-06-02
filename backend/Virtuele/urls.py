@@ -30,4 +30,7 @@ urlpatterns = [
         path('', include(prod_urls.urlpatterns), name="product"),
         path('', include(user_urls.urlpatterns), name="user"),
     ]), name='api'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static('media/', document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

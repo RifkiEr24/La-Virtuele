@@ -12,15 +12,19 @@ RUN mkdir /app
 COPY ./backend /app
 WORKDIR /app
 
+RUN rm -rf /app/env
+RUN rm -rf /app/serve
+
 COPY ./scripts /scripts
 RUN chmod +x /scripts/*
 
-RUN mkdir -p /vol/web/media
-RUN mkdir -p /vol/web/
+RUN mkdir -p /serve/media
+RUN mkdir -p /serve/static
 
 RUN adduser --disabled-password user
-RUN chown -R user:user /vol
-RUN chmod -R 755 /vol/web
+RUN chown -R user:user /app
+RUN chown -R user:user /serve
+RUN chmod -R 755 /serve
 
 USER user
 

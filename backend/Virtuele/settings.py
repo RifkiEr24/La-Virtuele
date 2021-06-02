@@ -122,8 +122,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR/'static/'
-MEDIA_ROOT = BASE_DIR/'media/'
+MEDIA_URL = '/media/'
+
+if DEBUG:
+    STATIC_ROOT = 'serve/static'
+    MEDIA_ROOT = 'serve/media'
+else:
+    STATIC_ROOT = '/serve/static'
+    MEDIA_ROOT = '/serve/media'
 
 AUTH_USER_MODEL = 'user.User'
 
