@@ -4,7 +4,7 @@ ENV PATH="/scripts:${PATH}"
 
 COPY backend/requirements.txt /requirements.txt
 RUN apt-get update \
-&& apt-get -y install gcc libc-dev \
+&& apt-get -y install gcc libc-dev libpq-dev python3-dev \
 && apt-get clean
 RUN pip install -r /requirements.txt
 
