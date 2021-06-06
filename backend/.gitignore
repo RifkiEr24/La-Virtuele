@@ -3,11 +3,13 @@ node_modules/
 /dist
 Makefile
 media/
+serve/
 dist/
 bundles/
 webpack-stats.json
 
 # local env files
+.env
 .env.local
 .env.*.local
 
