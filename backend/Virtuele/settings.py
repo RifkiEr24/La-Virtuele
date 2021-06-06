@@ -1,27 +1,18 @@
 from pathlib import Path
 import os
 from datetime import timedelta
+from decouple import config, Csv
+from dj_database_url import parse as db_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR/'templates/'
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
+SECRET_KEY = config('SECRET_KEY', default='changemeonproduction')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'changemeonproduction')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.environ.get('DEBUG', 1)))
 
-ALLOWED_HOSTS = []
-ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS')
-if ALLOWED_HOSTS_ENV:
-    ALLOWED_HOSTS.extend(ALLOWED_HOSTS_ENV.split(','))
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv()) if not DEBUG else []
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -73,20 +64,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Virtuele.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
-
-
-# Password validation
-# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
+else:
+    DATABASES = {
+        'default': config('DATABASE_URL', cast=db_url)
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -142,14 +130,14 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
-
-    # Important change this line to the frontend domain in production
-    "https://frontend-domain.com",
-]
-CORS_ALLOWED_ALL_ORIGINS = True
+if DEBUG:
+    CORS_ALLOWED_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = [
+        # Important change this line to the frontend domain in production
+        "https://frontend-domain.com",
+    ]
 
 DJOSER = {
     'SEND_ACTIVATION_EMAIL': True,
@@ -205,7 +193,7 @@ SWAGGER_SETTINGS = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'munawarhariz@gmail.com'
-EMAIL_HOST_PASSWORD = 'zlboniifaprqgedl'
-EMAIL_USE_TLS = True
+EMAIL_PORT = config('EMAIL_PORT', cast=int, default='')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default=True)
