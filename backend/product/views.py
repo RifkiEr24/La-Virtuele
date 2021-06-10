@@ -9,17 +9,53 @@ from user.permissions import IsActive, IsStaffOrReadOnly
 from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny
+from drf_yasg import openapi
 
 class Products(APIView):
 
     permission_classes = [IsStaffOrReadOnly]
-    
+
+    @swagger_auto_schema(
+        responses={
+            200: ProductSerializer(),
+            204: 'No Content'
+        }
+    )
     def get(self, request):
+        """
+        Product List
+
+        Return all available product. You can set a GET parameter to filter the result.<br>
+
+        GET parameter list:<br>
+        **featured**: If set to 'true' will only return featured product's
+        """
+
         products = [product for product in Product.objects.all()]
+        products = products.filter(is_featured=True) if request.GET.get('featured') == 'true' else products
+
+        if not products:
+            """Return early with no content (204) if no queryset found"""
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        request_body=CreateProductSerializer(),
+        responses={
+            201: openapi.Schema(type=openapi.TYPE_OBJECT, properties={'detail': 'Message', 'id': 'Product\'s ID', 'slug': 'Product\'s Slug'}),
+            400: 'Bad Request',
+            401: 'Invalid User\'s Credential'
+        }
+    )
     def post(self, request):
+        """
+        Create Product
+
+        A staff account is needed to request this endpoint, else 401
+        """
+
         serializer = CreateProductSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -33,13 +69,6 @@ class Products(APIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class FeaturedProducts(APIView):
-    permission_classes = [AllowAny]
-    def get(self, request):
-        products = [product for product in Product.objects.filter(is_featured=True)]
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)
-
 class ProductDetail(APIView):
 
     permission_classes = [IsStaffOrReadOnly]
@@ -50,12 +79,40 @@ class ProductDetail(APIView):
         except Product.DoesNotExist:
             raise Http404
 
+    @swagger_auto_schema(
+        responses={
+            200: ProductSerializer(),
+            404: 'No Product With That Slug Found'
+        }
+    )
     def get(self, request, slug):
+        """
+        Detail Product
+
+        Return the detail of product that the slug mentioned.
+        Return 404 if no product with that slug is found.
+        """
+
         product = self.get_object(slug)
         serializer = ProductSerializer(product)
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        responses={
+            200: ProductSerializer(),
+            400: 'Bad Request',
+            404: 'No Product With That Slug Found',
+            409: 'Some Unique Field(e.g username) Conflicted'
+        }
+    )
     def patch(self, request, slug):
+        """
+        Update Product
+
+        Update product that the slug mentioned, returned the updated product if succesful.<br>
+        Return 404 if no product with that slug is found.
+        """
+
         product = self.get_object(slug)
         try:
             serializer = ProductSerializer(product, data=request.data)
@@ -66,7 +123,20 @@ class ProductDetail(APIView):
             return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        responses={
+            204: 'Succesfully Delete Product',
+            404: 'No Product With That Slug Found'
+        }
+    )
     def delete(self, request, slug):
+        """
+        Delete Product
+
+        Delete product that the slug mentioned, then returned 204 if succesful
+        Return 404 if no product with that slug is found.
+        """
+
         product = self.get_object(slug)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -78,7 +148,7 @@ class GalleryList(APIView):
     @swagger_auto_schema(
         responses={
             200: GallerySerializer(),
-            204: 'No gallery results found'
+            204: 'No Gallery Results Found'
         }
     )
     def get(self, request):
@@ -89,21 +159,16 @@ class GalleryList(APIView):
         You can set a GET parameter to filter the result.
 
         GET parameter list:<br>
-        **featured**: If set to 'true' will only return featured product's gallery<br>
+        **featured**: If set to 'true' will only return featured product's gallery
         **product_slug**: Will only return product's gallery with mentioned slug
         """
+
         gallery = Gallery.objects.all().order_by('product')
-
-        if request.GET.get('featured') == 'true':
-            gallery = gallery.filter(product__is_featured=True)
-
-        if request.GET.get('product_slug'):
-            gallery = gallery.filter(product__slug=request.GET.get('product_slug'))
+        gallery = gallery.filter(product__is_featured=True) if request.GET.get('featured') == 'true' else gallery
+        gallery = gallery.filter(product__slug=request.GET.get('product_slug')) if request.GET.get('product_slug') else gallery
         
         if not gallery:
-            """
-            Return early with no content (204) if no queryset found
-            """
+            """Return early with no content (204) if no queryset found"""
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         serialize = GallerySerializer(gallery, many=True)
@@ -122,7 +187,7 @@ class Carts(APIView):
     @swagger_auto_schema(
         responses={
             200: CartSerializer(),
-            401: 'Invalid user\'s credential'
+            401: 'Invalid User\'s Credential'
         }
     )
     def get(self, request):
@@ -137,8 +202,8 @@ class CartItem(APIView):
     @swagger_auto_schema(
         responses={
             200: CartSerializer(),
-            400: 'Invalid size parameter',
-            404: 'Can\'t find product with that slug'
+            400: 'Invalid Size Parameter',
+            404: 'Can\'t Find Product With That Slug'
         }
     )
     def post(self, request, slug, size):
@@ -182,8 +247,8 @@ class CartItem(APIView):
     @swagger_auto_schema(
         responses={
             200: CartSerializer(),
-            400: 'Invalid size parameter',
-            404: 'There is no product with that slug on the cart',
+            400: 'Invalid Size Parameter',
+            404: 'There Is No Product With That Slug On The Cart',
         }
     )
     def delete(self, request, slug, size):
@@ -232,7 +297,6 @@ class CartItem(APIView):
         serialize = CartSerializer(cart)
         return Response(serialize.data)
 
-
 class Checkout(APIView):
     """
     Cart Checkout
@@ -241,6 +305,7 @@ class Checkout(APIView):
     No payment gateway implemented.
     Expecting to use midtrans.
     """
+
     permission_classes = [IsActive]
 
     def get_cart(self, request):
