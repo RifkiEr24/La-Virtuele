@@ -1,11 +1,6 @@
 from rest_framework import serializers
 from product.models import Cart, Gallery, Product, ProductCart, SIZE_CHOICES, Category
 
-class MyPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-
-    def to_representation(self, value):
-        return str(value)
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category

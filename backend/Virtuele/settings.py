@@ -26,7 +26,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'djoser',
     'corsheaders',
-    'webpack_loader',
     'drf_yasg',
 
     'product',
