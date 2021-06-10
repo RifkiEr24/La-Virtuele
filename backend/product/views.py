@@ -8,10 +8,12 @@ from django.shortcuts import get_object_or_404
 from user.permissions import IsActive, IsStaffOrReadOnly
 from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from rest_framework.permissions import AllowAny
 
 class Products(APIView):
+
     permission_classes = [IsStaffOrReadOnly]
+    
     def get(self, request):
         products = [product for product in Product.objects.all()]
         serializer = ProductSerializer(products, many=True)
@@ -32,12 +34,16 @@ class Products(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class FeaturedProducts(APIView):
+    permission_classes = [AllowAny]
     def get(self, request):
         products = [product for product in Product.objects.filter(is_featured=True)]
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 
 class ProductDetail(APIView):
+
+    permission_classes = [IsStaffOrReadOnly]
+
     def get_object(self, slug):
         try:
             return Product.objects.get(slug=slug)
@@ -66,7 +72,26 @@ class ProductDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class GalleryList(APIView):
+
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        responses={
+            200: GallerySerializer(),
+            204: 'No gallery results found'
+        }
+    )
     def get(self, request):
+        """
+        Gallery
+
+        Return all available gallery image.
+        You can set a GET parameter to filter the result.
+
+        GET parameter list:<br>
+        **featured**: If set to 'true' will only return featured product's gallery<br>
+        **product_slug**: Will only return product's gallery with mentioned slug
+        """
         gallery = Gallery.objects.all().order_by('product')
 
         if request.GET.get('featured') == 'true':
@@ -76,9 +101,9 @@ class GalleryList(APIView):
             gallery = gallery.filter(product__slug=request.GET.get('product_slug'))
         
         if not gallery:
-            '''
+            """
             Return early with no content (204) if no queryset found
-            '''
+            """
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         serialize = GallerySerializer(gallery, many=True)
@@ -212,9 +237,9 @@ class Checkout(APIView):
     """
     Cart Checkout
 
-    Dummy checkout API
-    No payment gateway implemented
-    Expecting to use midtrans
+    Dummy checkout API.
+    No payment gateway implemented.
+    Expecting to use midtrans.
     """
     permission_classes = [IsActive]
 
