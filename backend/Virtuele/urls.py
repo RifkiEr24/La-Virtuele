@@ -12,12 +12,12 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Virtuele REST API",
+      title='Virtuele REST API',
       default_version='v1',
-      description="Test description",
-      terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
-      license=openapi.License(name="BSD License"),
+      description='REST API for La-Virtuele\'s Website',
+      terms_of_service='https://www.google.com/policies/terms/',
+      contact=openapi.Contact(email='virtuele.dev@gmail.com'),
+      license=openapi.License(name='MIT License'),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
@@ -25,10 +25,10 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('', schema_view.with_ui('redoc', cache_timeout=0), name='schema-swagger-ui'),
     path('api/v1/', include([
-        path('', include(prod_urls.urlpatterns), name="product"),
-        path('', include(user_urls.urlpatterns), name="user"),
+        path('', include(prod_urls.urlpatterns), name='product'),
+        path('', include(user_urls.urlpatterns), name='user'),
     ]), name='api'),
 ]
 
