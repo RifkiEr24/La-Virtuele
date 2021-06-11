@@ -7,6 +7,15 @@ html, body {
 .header{
   font-family: 'Bebas Neue', cursive;
 }
+a{
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-block;
+}
+.accesibillity-size{
+  min-width: 44px;
+  min-height: 44px;
+}
 /* .slick-dots li{
   margin: 0 5px !important; 
 } */

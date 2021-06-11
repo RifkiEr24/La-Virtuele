@@ -1,7 +1,7 @@
 <template>
-  <div class="home">
+  <div class="home pt-16 md:pt-0">
     <div class="flex flex-wrap flex-col-reverse md:flex-row">
-      <div class="w-full md:w-5/12 p-0 md:pr-20">
+      <div class="w-full md:w-5/12 p-0 md:pr-8">
         <VueSlickCarousel :arrows="true" :dots="false">
           <div>
             <img src="@/assets/img/1.png" alt="">

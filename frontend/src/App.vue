@@ -2,7 +2,7 @@
   <div>
   <Navbar/>
 <vue-page-transition name="fade">
-<router-view v-slot="{ Component }">
+<router-view :class="{ 'pt-16': $route.path != '/' }" v-slot="{ Component }">
     <component :is="Component" />
 </router-view>
   </vue-page-transition>
