@@ -2,37 +2,7 @@
   <div class="home pt-16 md:pt-0">
     <div class="flex flex-wrap flex-col-reverse md:flex-row">
       <div class="w-full md:w-5/12 p-0 md:pr-8">
-        <VueSlickCarousel :arrows="true" :dots="false">
-          <div>
-            <img src="@/assets/img/1.png" alt="">
-          </div>
-          <div> <img src="@/assets/img/2.png" alt=""></div>
-          <div> <img src="@/assets/img/3.png" alt=""></div>
-          <div> <img src="@/assets/img/4.png" alt=""></div>
-          <div> <img src="@/assets/img/5.png" alt=""></div>
-          <div> <img src="@/assets/img/6.png" alt=""></div>
-
-          <template #prevArrow>
-            <div class="right-bot prev">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" viewBox="0 0 20 20"
-                fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                  clip-rule="evenodd" />
-              </svg>
-            </div>
-          </template>
-          <template #nextArrow>
-            <div class="right-bot next">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" viewBox="0 0 20 20"
-                fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clip-rule="evenodd" />
-              </svg>
-            </div>
-          </template>
-        </VueSlickCarousel>
+        <hero-carousel />
       </div>
       <div class="w-full md:w-7/12 p-5 relative">
         <p class="header text-6xl mt-0 md:mt-16">Humanize <br> The Virtual</p>
@@ -69,17 +39,61 @@
         </div>
       </div>
     </div>
-    <div class="mt-28 text-center text-lg container mx-auto">
-      <a @click="featured = true" class="mx-8">Featured</a>
-      <a @click="featured = false" class="mx-8">New Arrivals</a>
-      <transition name="fade" mode="out-in">
-        <div class="w-full mx-auto" v-if="featured == true">
-          <featured-carousel />
+    <div class="mt-28 container mx-auto">
+      <div class="flex justify-between border border-black relative w-full">
+        <div class="absolute bg-secondary w-48 h-full z-0 shape-identify" id="featured-button" ref="identifier"></div>
+          <button @click="showFeatured"  class="featured-button  p-2 w-48 header text-3xl text-white z-10" ref="featured">Featured</button>
+         <button @click="showNew" class="new-arrival-button p-2 w-48 header new-arrival-button text-3xl z-10 transition duration-400" ref="newarrival">New Arrivals</button>
+      </div>
+    
+      <fade-transition  >
+
+        <div class="flex gap-8 mt-10 text-center"  v-show="featured"  >
+          <div class="w-3/12 ">
+          <div class="img-card relative ">
+                     <div class="content-details fadeIn-top z-10">
+                       <button class="bg-white text-3xl p-2 rounded-lg mx-2">
+                         <span class="iconify" data-icon="carbon:zoom-pan"
+                           data-inline="false"></span>
+                       </button>
+                         <button class="bg-primary text-3xl p-2 rounded-lg mx-2">
+                        <span class="iconify text-white" data-icon="carbon:shopping-cart-plus" data-inline="false"></span>
+                       </button>
+                     </div>
+                 <div class="img-overlay bg-secondary h-full absolute w-full "></div>
+                  <img src="@/assets/img/item-test.png" class="w-full" alt="">
+              
+          </div>
+       
+            <p class="font-light mt-3">Mature</p>
+            <p class="font-semibold">Rp 175.000</p>
+          </div>
+         <div class="w-3/12">
+            <img src="@/assets/img/item-test.png" class="mx-auto" alt="">
+            <p class="font-light mt-3">Mature</p>
+            <p class="font-semibold">Rp 175.000</p>
+          </div>
+           <div class="w-3/12">
+            <img src="@/assets/img/item-test.png" class="mx-auto" alt="">
+            <p class="font-light mt-3">Mature</p>
+            <p class="font-semibold">Rp 175.000</p>
+          </div>
+           <div class="w-3/12">
+            <img src="@/assets/img/item-test.png" class="mx-auto" alt="">
+            <p class="font-light mt-3">Mature</p>
+            <p class="font-semibold">Rp 175.000</p>
+          </div>
         </div>
-        <div class="w-full" v-else-if="featured == false">
-          <featured-carousel />
+      </fade-transition>
+
+      <fade-transition   >
+            
+        <div class="w-full"  v-show="featured == false">
+          b
         </div>
-      </transition>
+      </fade-transition>
+
+
     </div>
     <highlight-carousel class="mt-8" />
   </div>
@@ -87,71 +101,96 @@
 
 <script>
 // @ is an alias to /src
-import VueSlickCarousel from 'vue-slick-carousel'
-  import 'vue-slick-carousel/dist/vue-slick-carousel.css'
-  // optional style for arrows & dots
-  import 'vue-slick-carousel/dist/vue-slick-carousel-theme.css'
-  import FeaturedCarousel from '@/components/FeaturedCarousel.vue';
-    import HighlightCarousel from '@/components/HighlightCarousel.vue';
+import { FadeTransition } from 'vue2-transitions'
 
+    import HighlightCarousel from '@/components/HighlightCarousel.vue';
+  import HeroCarousel from '@/components/HeroCarousel.vue'
 export default {
   name: 'Home',
   data(){
     return{
-      featured: true
-    } 
+      featured: true,
+      show: true,
+      idIdentifier:"featured-button"
+    }
   },
   components: {
-     VueSlickCarousel,
-     FeaturedCarousel,
-     HighlightCarousel,
+    FadeTransition,
+    HeroCarousel,
+     HighlightCarousel
   },
+  methods: {
+    toogle(){
+				this.featured = !this.featured;
+			},
+      showFeatured: function (event){
+          this.$refs.featured.classList.add('text-white');    
+                    this.$refs.newarrival.classList.remove('text-white');    
+
+        this.$refs.identifier.id=event.target.classList[0];
+        this.featured = true;
+      },
+        showNew: function (event){
+             this.$refs.identifier.id=event.target.classList[0];
+             this.$refs.newarrival.classList.add('text-white');
+              this.$refs.featured.classList.remove('text-white'); 
+              this.featured = false;   
+      }
+  }
 };
 </script>
 <style scoped lang="postcss">
-.slick-prev, .slick-next {
-   @apply rounded-lg;
-  @apply w-10;
-  @apply py-8;
-  @apply h-10;
-  @apply text-4xl;
-  @apply border;
-  @apply border-white;
-  @apply hover:bg-primary;
-  @apply hover:border-primary;
-  @apply transition;
-  @apply duration-300;
-  @apply focus:outline-none;
-  background-color: transparent;
+.img-overlay{
+  background: rgba(0,0,0,0.7);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  opacity: 0;
+  right: 0;
+  -webkit-transition: all 0.4s ease-in-out 0s;
+  -moz-transition: all 0.4s ease-in-out 0s;
+  transition: all 0.4s ease-in-out 0s;
+}
+.img-card:hover .img-overlay{
+  opacity: 0.75;
+}
+.content-details {
+  position: absolute;
   text-align: center;
-  padding: 0;
-  color: white;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid white;
-  cursor: pointer;
-  z-index: 3;
+  padding-left: 1em;
+  padding-right: 1em;
+  width: 100%;
+  left: 50%;
+  opacity: 0;
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  -webkit-transition: all 0.3s ease-in-out 0s;
+  -moz-transition: all 0.3s ease-in-out 0s;
+  transition: all 0.3s ease-in-out 0s;
+}
+.img-card:hover .content-details{
+  top: 85%;
+  left: 50%;
+  opacity: 1;
+}
+.fadeIn-top{
+  top: 100%;
+}
+.shape-identify{
+  transition: margin 1s linear;
+    transition: 750ms;
+}
+.shape-identify#featured-button {
+  left: 0;
+  /* transform: translateX(-50%); */
 }
 
- .right-bot.next {
-    top: unset;
-    right: 0;
-    transform: translate(0, 0);
-    right: 20px;
-    bottom: 85px;
-  }
-   .right-bot.prev {
-     top: unset;
-    left: unset;
-    right:80px;
-    transform: translate(0, 0);
-    bottom: 85px;
-  }
-
-  .slick-next:before{
-    content: '';
-  }
-    .slick-prev:before{
-    content: '';
-  }
+.shape-identify#new-arrival-button {
+  left: 100%;
+  transform: translateX(-100%);
+}
 </style>
