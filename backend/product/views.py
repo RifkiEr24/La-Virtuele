@@ -28,11 +28,13 @@ class Products(APIView):
         Return all available product. You can set a GET parameter to filter the result.<br>
 
         GET parameter list:<br>
-        **featured**: If set to 'true' will only return featured product's
+        **featured**: If set to 'true' will only return featured products
         """
 
-        products = [product for product in Product.objects.all()]
-        products = products.filter(is_featured=True) if request.GET.get('featured') == 'true' else products
+        product_qs = Product.objects.all()
+        product_qs = product_qs.filter(is_featured=True) if request.GET.get('featured') == 'true' else product_qs
+
+        products = [product for product in product_qs]
 
         if not products:
             """Return early with no content (204) if no queryset found"""
@@ -89,7 +91,7 @@ class ProductDetail(APIView):
         """
         Detail Product
 
-        Return the detail of product that the slug mentioned.
+        Return the detail of product that the slug mentioned.<br>
         Return 404 if no product with that slug is found.
         """
 
@@ -159,7 +161,7 @@ class GalleryList(APIView):
         You can set a GET parameter to filter the result.
 
         GET parameter list:<br>
-        **featured**: If set to 'true' will only return featured product's gallery
+        **featured**: If set to 'true' will only return featured product's gallery<br>
         **product_slug**: Will only return product's gallery with mentioned slug
         """
 
@@ -179,7 +181,12 @@ class Carts(APIView):
     Cart List
 
     Return a list of user's cart if request is authenticated
-    else return 401 code.
+    else return 401 code.<br>
+    You can set a GET parameter to filter its result.<br>
+
+    GET parameter list:
+    **checked**: If set to 'true' will return only checked out cart,
+    else if you set it to 'false' will return only non checked out cart (active cart)
     """
 
     permission_classes = [IsActive]
@@ -187,12 +194,25 @@ class Carts(APIView):
     @swagger_auto_schema(
         responses={
             200: CartSerializer(),
+            204: 'No Result Found',
             401: 'Invalid User\'s Credential'
         }
     )
     def get(self, request):
         user = request.user
-        carts = [cart for cart in Cart.objects.filter(user__username=user)]
+        cart_qs = Cart.objects.filter(user__username=user)
+        if request.GET.get('checked') == 'true':
+            cart_condition = True
+        elif request.GET.get('checked') == 'false':
+            cart_condition = False
+
+        cart_qs = cart_qs.filter(checked_out=cart_condition) if not cart_condition == None else cart_qs
+        carts = [cart for cart in cart_qs]
+
+        if not carts:
+            """Return early with no content (204) if no queryset found"""
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         serializer = CartSerializer(carts, many=True)
         return Response(serializer.data)
 

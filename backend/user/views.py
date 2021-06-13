@@ -11,7 +11,7 @@ class VirtueleTokenObtainPairView(TokenObtainPairView):
     """
     Generate JWT Token
 
-    Return two kinds of token if authentication is succesfull.<br>
+    Return two kinds of token if authentication is succesful.<br>
     The access token will valid for 30 minutes, while the refresh for 7 days.<br>
     Use the access token as an authorization for any protected API.
     """
