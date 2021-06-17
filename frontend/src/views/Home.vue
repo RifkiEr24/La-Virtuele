@@ -10,9 +10,7 @@
           adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
           enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
           commodo consequat. Duis aute irure dolor in</p>
-        <button
-          class="border-primary mt-12 border rounded-xl p-3 transition duration-500 hover:bg-primary hover:rounded-xl hover:text-white px-16">Let's
-          Go</button>
+        <primary-button class="mt-12" btn-text="Let's Go"/>
         <div class="absolute bottom-5 right-12 md:bottom-3 md:right-36 flex">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="-7 -2 24 24" width="30" height="30"
             preserveAspectRatio="xMinYMin" class="icon__icon">
@@ -41,70 +39,103 @@
     </div>
     <div class="mt-28 container mx-auto">
       <div class="flex justify-between border border-black relative w-full">
-        <div class="absolute bg-secondary w-48 h-full z-0 shape-identify" id="featured-button" ref="identifier"></div>
-          <button @click="showFeatured"  class="featured-button  p-2 w-48 header text-3xl text-white z-10" ref="featured">Featured</button>
-         <button @click="showNew" class="new-arrival-button p-2 w-48 header new-arrival-button text-3xl z-10 transition duration-400" ref="newarrival">New Arrivals</button>
+        <div class="absolute bg-secondary w-48 h-full z-0 shape-identify" id="featured-button"
+          ref="identifier"></div>
+        <button @click="showFeatured"
+          class="featured-button  p-2 w-48 header text-3xl text-white z-10"
+          ref="featured">Featured</button>
+        <button @click="showNew"
+          class="new-arrival-button p-2 w-48 header new-arrival-button text-3xl z-10 transition duration-400"
+          ref="newarrival">New Arrivals</button>
       </div>
-    
-      <fade-transition  >
 
-        <div class="flex gap-8 mt-10 text-center"  v-show="featured"  >
-          <div class="w-3/12 ">
-          <div class="img-card relative ">
-                     <div class="content-details fadeIn-top z-10">
-                       <button class="bg-white text-3xl p-2 rounded-lg mx-2">
-                         <span class="iconify" data-icon="carbon:zoom-pan"
-                           data-inline="false"></span>
-                       </button>
-                         <button class="bg-primary text-3xl p-2 rounded-lg mx-2">
-                        <span class="iconify text-white" data-icon="carbon:shopping-cart-plus" data-inline="false"></span>
-                       </button>
-                     </div>
-                 <div class="img-overlay bg-secondary h-full absolute w-full "></div>
-                  <img src="@/assets/img/item-test.png" class="w-full" alt="">
-              
-          </div>
+      <fade-transition>
+
+        <div class=" mt-10 text-center" v-show="featured">
+          <div class="flex  flex-wrap  -mx-2">
+            <product-item class="w-6/12 md:w-3/12  px-2" image-product="item-test.png" name-product="Mature" price-product="Rp 150.000" />
        
-            <p class="font-light mt-3">Mature</p>
-            <p class="font-semibold">Rp 175.000</p>
-          </div>
-         <div class="w-3/12">
-            <img src="@/assets/img/item-test.png" class="mx-auto" alt="">
-            <p class="font-light mt-3">Mature</p>
-            <p class="font-semibold">Rp 175.000</p>
-          </div>
-           <div class="w-3/12">
-            <img src="@/assets/img/item-test.png" class="mx-auto" alt="">
-            <p class="font-light mt-3">Mature</p>
-            <p class="font-semibold">Rp 175.000</p>
-          </div>
-           <div class="w-3/12">
-            <img src="@/assets/img/item-test.png" class="mx-auto" alt="">
-            <p class="font-light mt-3">Mature</p>
-            <p class="font-semibold">Rp 175.000</p>
-          </div>
-        </div>
-      </fade-transition>
-
-      <fade-transition   >
             
-        <div class="w-full"  v-show="featured == false">
+            <div class="w-6/12 md:w-3/12   px-2">
+              <div class="img-card relative ">
+                <div class="content-details fadeIn-top z-10">
+                  <button class="bg-white text-3xl p-2 rounded-lg mx-2">
+                    <span class="iconify" data-icon="carbon:zoom-pan" data-inline="false"></span>
+                  </button>
+                  <button class="bg-primary text-3xl p-2 rounded-lg mx-2">
+                    <span class="iconify text-white" data-icon="carbon:shopping-cart-plus"
+                      data-inline="false"></span>
+                  </button>
+                </div>
+                <div class="img-overlay bg-secondary h-full absolute w-full "></div>
+                <img src="@/assets/img/item-test.png" class="w-full" alt="">
+
+              </div>
+
+              <p class="font-light mt-3">Mature</p>
+              <p class="font-semibold">Rp 175.000</p>
+            </div>
+            <div class="w-6/12 md:w-3/12   px-2">
+              <div class="img-card relative ">
+                <div class="content-details fadeIn-top z-10">
+                  <button class="bg-white text-3xl p-2 rounded-lg mx-2">
+                    <span class="iconify" data-icon="carbon:zoom-pan" data-inline="false"></span>
+                  </button>
+                  <button class="bg-primary text-3xl p-2 rounded-lg mx-2">
+                    <span class="iconify text-white" data-icon="carbon:shopping-cart-plus"
+                      data-inline="false"></span>
+                  </button>
+                </div>
+                <div class="img-overlay bg-secondary h-full absolute w-full "></div>
+                <img src="@/assets/img/item-test.png" class="w-full" alt="">
+
+              </div>
+
+              <p class="font-light mt-3">Mature</p>
+              <p class="font-semibold">Rp 175.000</p>
+            </div>
+            
+            <div class="w-6/12 md:w-3/12   px-2">
+              <div class="img-card relative ">
+                <div class="content-details fadeIn-top z-10">
+                  <button class="bg-white text-3xl p-2 rounded-lg mx-2">
+                    <span class="iconify" data-icon="carbon:zoom-pan" data-inline="false"></span>
+                  </button>
+                  <button class="bg-primary text-3xl p-2 rounded-lg mx-2">
+                    <span class="iconify text-white" data-icon="carbon:shopping-cart-plus"
+                      data-inline="false"></span>
+                  </button>
+                </div>
+                <div class="img-overlay bg-secondary h-full absolute w-full "></div>
+                <img src="@/assets/img/item-test.png" class="w-full" alt="">
+
+              </div>
+
+              <p class="font-light mt-3">Mature</p>
+              <p class="font-semibold">Rp 175.000</p>
+            </div>
+          </div>
+        <primary-button class="mt-12" btn-text="See More"/>
+
+
+        </div>
+
+      </fade-transition>
+      <fade-transition>
+        <div class="w-full" v-show="featured == false">
           b
         </div>
       </fade-transition>
-
-
     </div>
-    <highlight-carousel class="mt-8" />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import { FadeTransition } from 'vue2-transitions'
-
-    import HighlightCarousel from '@/components/HighlightCarousel.vue';
-  import HeroCarousel from '@/components/HeroCarousel.vue'
+import PrimaryButton from '@/components/PrimaryButton.vue'
+import HeroCarousel from '@/components/HeroCarousel.vue'
+import ProductItem from '@/components/ProductItem.vue';
 export default {
   name: 'Home',
   data(){
@@ -115,18 +146,23 @@ export default {
     }
   },
   components: {
+    PrimaryButton,
     FadeTransition,
     HeroCarousel,
-     HighlightCarousel
+    ProductItem
+  },
+  created(){
+      this.axios.get('https://la-virtuele.harizmunawar.repl.co/api/v1/products/').then((response) => {
+        console.log(response.data)
+      })
   },
   methods: {
     toogle(){
 				this.featured = !this.featured;
 			},
       showFeatured: function (event){
-          this.$refs.featured.classList.add('text-white');    
-                    this.$refs.newarrival.classList.remove('text-white');    
-
+        this.$refs.featured.classList.add('text-white');    
+        this.$refs.newarrival.classList.remove('text-white');    
         this.$refs.identifier.id=event.target.classList[0];
         this.featured = true;
       },
