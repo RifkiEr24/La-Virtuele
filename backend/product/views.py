@@ -34,10 +34,13 @@ class Products(APIView):
         product_qs = Product.objects.all()
         product_qs = product_qs.filter(is_featured=True) if request.GET.get('featured') == 'true' else product_qs
 
+        for product in product_qs:
+            product.gallery = Gallery.objects.exclude(image_type='M')
+
         products = [product for product in product_qs]
 
         if not products:
-            """Return early with no content (204) if no queryset found"""
+            # Return early with no content (204) if no queryset found
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         serializer = ProductSerializer(products, many=True)
@@ -170,7 +173,7 @@ class GalleryList(APIView):
         gallery = gallery.filter(product__slug=request.GET.get('product_slug')) if request.GET.get('product_slug') else gallery
         
         if not gallery:
-            """Return early with no content (204) if no queryset found"""
+            # Return early with no content (204) if no queryset found
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         serialize = GallerySerializer(gallery, many=True)
@@ -210,7 +213,7 @@ class Carts(APIView):
         carts = [cart for cart in cart_qs]
 
         if not carts:
-            """Return early with no content (204) if no queryset found"""
+            # Return early with no content (204) if no queryset found
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         serializer = CartSerializer(carts, many=True)

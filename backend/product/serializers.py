@@ -1,10 +1,13 @@
+from django.db.models.query import Prefetch
+from django.db.models.query_utils import Q
 from rest_framework import serializers
 from product.models import Cart, Gallery, Product, ProductCart, SIZE_CHOICES, Category
 
 class CategorySerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='category')
     class Meta:
         model = Category
-        fields = ('category',)
+        fields = ('name',)
 
 class GallerySerializer(serializers.ModelSerializer):
     product = serializers.StringRelatedField()
@@ -14,12 +17,31 @@ class GallerySerializer(serializers.ModelSerializer):
         model = Gallery
         fields = ('image', 'width', 'height', 'product', 'type', 'type_code')
 
+class GalleryModelSerializer(serializers.ModelSerializer):
+    product = serializers.StringRelatedField()
+    
+    def get_queryset():
+        return Gallery.objects.filter(image_type='M')
+    class Meta:
+        model = Gallery
+        fields = ('image', 'width', 'height', 'product')
+
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True, many=True)
-    gallery = GallerySerializer(read_only=True, many=True)
+    gallery = serializers.SerializerMethodField()
+    model = serializers.SerializerMethodField()
+
+    def get_gallery(self, product):
+        qs = Gallery.objects.filter(product=product).exclude(image_type='M')
+        return GallerySerializer(instance=qs, many=True).data
+
+    def get_model(self, product):
+        qs = Gallery.objects.filter(image_type='M', product=product)
+        return GallerySerializer(instance=qs, many=True).data
+
     class Meta:
         model = Product
-        fields = ('__all__')
+        fields = ('product', 'slug', 'price', 'material', 'category', 'is_featured', 'model', 'gallery')
 
 class CreateProductSerializer(serializers.ModelSerializer):
     class Meta:
