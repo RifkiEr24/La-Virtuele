@@ -13,18 +13,10 @@ class GallerySerializer(serializers.ModelSerializer):
     product = serializers.StringRelatedField()
     type = serializers.CharField(source='get_image_type_display')
     type_code = serializers.CharField(source='image_type')
+    
     class Meta:
         model = Gallery
         fields = ('image', 'width', 'height', 'product', 'type', 'type_code')
-
-class GalleryModelSerializer(serializers.ModelSerializer):
-    product = serializers.StringRelatedField()
-    
-    def get_queryset():
-        return Gallery.objects.filter(image_type='M')
-    class Meta:
-        model = Gallery
-        fields = ('image', 'width', 'height', 'product')
 
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True, many=True)
@@ -53,7 +45,6 @@ class CreateProductSerializer(serializers.ModelSerializer):
         product = Product.objects.create(**validated_data)
         product.category.add(*categories)
         return product
-
 
 class ProductCartSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
