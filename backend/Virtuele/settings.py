@@ -130,10 +130,16 @@ REST_FRAMEWORK = {
 }
 
 if DEBUG:
+    CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOWED_ALL_ORIGINS = True
 else:
+    CORS_ORIGIN_ALLOW_ALL = False
     CORS_ALLOWED_ALL_ORIGINS = False
     CORS_ALLOWED_ORIGINS = [
+        # Important change this line to the frontend domain in production
+        "https://frontend-domain.com",
+    ]
+    CORS_ORIGIN_WHITELIST = [
         # Important change this line to the frontend domain in production
         "https://frontend-domain.com",
     ]

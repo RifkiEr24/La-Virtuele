@@ -1,0 +1,523 @@
+[
+{
+  "model": "product.category",
+  "pk": 1,
+  "fields": {
+    "category": "Oversized T-Shirt"
+  }
+},
+{
+  "model": "product.product",
+  "pk": 1,
+  "fields": {
+    "product": "Collapse",
+    "slug": "collapse",
+    "price": 200000.0,
+    "material": "Cotton Hispanic 200gsm (streetwear)",
+    "is_featured": true,
+    "category": [
+      1
+    ]
+  }
+},
+{
+  "model": "product.product",
+  "pk": 2,
+  "fields": {
+    "product": "Cupidity",
+    "slug": "cupidity",
+    "price": 250000.0,
+    "material": "Cotton HISPANIC 300gsm (streetwear)",
+    "is_featured": false,
+    "category": [
+      1
+    ]
+  }
+},
+{
+  "model": "product.product",
+  "pk": 3,
+  "fields": {
+    "product": "Virtuele",
+    "slug": "virtuele",
+    "price": 225000.0,
+    "material": "Cotton 400gsm (streetwear)",
+    "is_featured": true,
+    "category": [
+      1
+    ]
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 1,
+  "fields": {
+    "product": 2,
+    "image_type": "PF",
+    "height": 2000,
+    "width": 2000,
+    "image": "Cupidity_Front.jpg"
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 2,
+  "fields": {
+    "product": 2,
+    "image_type": "PB",
+    "height": 2000,
+    "width": 2000,
+    "image": "Cupidity_Back.jpg"
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 3,
+  "fields": {
+    "product": 2,
+    "image_type": "O",
+    "height": 2000,
+    "width": 2000,
+    "image": "Cupidity_D1.jpg"
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 4,
+  "fields": {
+    "product": 2,
+    "image_type": "M",
+    "height": 1616,
+    "width": 1080,
+    "image": "DSC07782.JPG"
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 5,
+  "fields": {
+    "product": 2,
+    "image_type": "M",
+    "height": 1616,
+    "width": 1080,
+    "image": "DSC08029.JPG"
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 6,
+  "fields": {
+    "product": 1,
+    "image_type": "PF",
+    "height": 2000,
+    "width": 2000,
+    "image": "Collapse_Front.jpg"
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 7,
+  "fields": {
+    "product": 1,
+    "image_type": "PB",
+    "height": 2000,
+    "width": 2000,
+    "image": "Collapse_Back.jpg"
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 8,
+  "fields": {
+    "product": 1,
+    "image_type": "O",
+    "height": 2000,
+    "width": 2000,
+    "image": "Collapse_D1.jpg"
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 9,
+  "fields": {
+    "product": 1,
+    "image_type": "M",
+    "height": 1532,
+    "width": 1062,
+    "image": "0FBC377B-ACA3-4565-A35A-3EF6F516270D.jpg"
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 10,
+  "fields": {
+    "product": 3,
+    "image_type": "PF",
+    "height": 2000,
+    "width": 2000,
+    "image": "Virtuele_Front.jpg"
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 11,
+  "fields": {
+    "product": 3,
+    "image_type": "PB",
+    "height": 2000,
+    "width": 2000,
+    "image": "Virtuele_Back.jpg"
+  }
+},
+{
+  "model": "product.gallery",
+  "pk": 12,
+  "fields": {
+    "product": 3,
+    "image_type": "O",
+    "height": 2000,
+    "width": 2000,
+    "image": "Virtuele_D1.jpg"
+  }
+},
+{
+  "model": "user.user",
+  "fields": {
+    "password": "pbkdf2_sha256$216000$Q98rBYh2MgMY$rWYntX8O7kqoEGNebKLj1XUR9YG5VFrL7XlVHLVYF6k=",
+    "last_login": "2021-06-13T11:41:02.031Z",
+    "email": "virtuele.dev@gmail.com",
+    "username": "Virtuele",
+    "first_name": "La",
+    "last_name": "Virtuele",
+    "height": null,
+    "width": null,
+    "avatar": "",
+    "is_active": true,
+    "is_superuser": true
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2021-06-13T11:42:06.066Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "category"
+    ],
+    "object_id": "1",
+    "object_repr": "Oversized T-Shirt",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 2,
+  "fields": {
+    "action_time": "2021-06-13T11:47:06.527Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "product"
+    ],
+    "object_id": "1",
+    "object_repr": "Collapse",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 3,
+  "fields": {
+    "action_time": "2021-06-13T11:47:56.468Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "product"
+    ],
+    "object_id": "2",
+    "object_repr": "Cupidity",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 4,
+  "fields": {
+    "action_time": "2021-06-13T11:50:35.745Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "product"
+    ],
+    "object_id": "3",
+    "object_repr": "Virtuele",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 5,
+  "fields": {
+    "action_time": "2021-06-13T11:57:23.830Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "1",
+    "object_repr": "PF-collapse-2000x2000",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 6,
+  "fields": {
+    "action_time": "2021-06-13T11:57:44.269Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "1",
+    "object_repr": "PF-cupidity-2000x2000",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Product\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 7,
+  "fields": {
+    "action_time": "2021-06-13T11:57:58.897Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "2",
+    "object_repr": "PB-cupidity-2000x2000",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 8,
+  "fields": {
+    "action_time": "2021-06-13T11:58:17.539Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "3",
+    "object_repr": "O-cupidity-2000x2000",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 9,
+  "fields": {
+    "action_time": "2021-06-13T11:58:32.528Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "4",
+    "object_repr": "M-cupidity-1080x1616",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 10,
+  "fields": {
+    "action_time": "2021-06-13T11:58:50.149Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "5",
+    "object_repr": "O-cupidity-1080x1616",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 11,
+  "fields": {
+    "action_time": "2021-06-13T11:59:19.028Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "5",
+    "object_repr": "M-cupidity-1080x1616",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Image type\", \"Image\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 12,
+  "fields": {
+    "action_time": "2021-06-13T12:00:47.817Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "6",
+    "object_repr": "PF-collapse-2000x2000",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 13,
+  "fields": {
+    "action_time": "2021-06-13T12:01:03.911Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "7",
+    "object_repr": "PB-collapse-2000x2000",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 14,
+  "fields": {
+    "action_time": "2021-06-13T12:01:18.344Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "8",
+    "object_repr": "O-collapse-2000x2000",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 15,
+  "fields": {
+    "action_time": "2021-06-13T12:01:32.383Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "9",
+    "object_repr": "M-collapse-1062x1532",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 16,
+  "fields": {
+    "action_time": "2021-06-13T12:02:12.508Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "10",
+    "object_repr": "PF-virtuele-2000x2000",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 17,
+  "fields": {
+    "action_time": "2021-06-13T12:02:26.812Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "11",
+    "object_repr": "PB-virtuele-2000x2000",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 18,
+  "fields": {
+    "action_time": "2021-06-13T12:02:39.456Z",
+    "user": [
+      "virtuele.dev@gmail.com"
+    ],
+    "content_type": [
+      "product",
+      "gallery"
+    ],
+    "object_id": "12",
+    "object_repr": "O-virtuele-2000x2000",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+}
+]

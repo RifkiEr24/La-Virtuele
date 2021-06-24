@@ -84,7 +84,7 @@ const errorInterceptor = (error) => {
 
   if (isCorrectRefreshError(status)) {
     return refreshToken().then(() => {
-      const headerAuthorization = `Bearer ${window.localStorage.getItem(ACCESS_TOKEN)}`;
+      const headerAuthorization = `JWT ${window.localStorage.getItem(ACCESS_TOKEN)}`;
       authRequest.defaults.headers.Authorization = headerAuthorization;
       originalRequest.headers.Authorization = headerAuthorization;
       return authRequest(originalRequest);
