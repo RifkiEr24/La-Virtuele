@@ -24,6 +24,7 @@ import axios from 'axios'
       window.addEventListener('scroll', f)
     }
   })
+  
 Vue.use(Transitions)
 Vue.use(VuePageTransition)
 Vue.config.productionTip = false;

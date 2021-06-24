@@ -65,7 +65,6 @@ export default {
     },
      updateScroll() {
        this.scrollPosition = window.scrollY
-       console.log(this.scrollPosition);
     }
     
   },
