@@ -68,7 +68,6 @@
            <div class=" mt-10 text-center" v-show="featured == false">
           <div class="flex  flex-wrap  -mx-2">
             <div class="w-6/12 md:w-3/12  px-2" v-for="item in productlist" :key="item.id">
-            <p style="font-size:20pt;">a</p>
               <product-item :slug-product="item.slug" :image-product="item.model[0].image || 'a'" :name-product="item.product"
                 :price-product="`Rp ${item.price}`" />
             </div>
