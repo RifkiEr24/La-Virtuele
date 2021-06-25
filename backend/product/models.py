@@ -29,13 +29,13 @@ RATING_CHOICES = (
 )
 
 class Category(models.Model):
-    category = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
 
     def __str__(self, *args, **kwargs):
         return self.category
 
 class Product(models.Model):
-    product = models.CharField(verbose_name='Product Name', max_length=255)
+    name = models.CharField(verbose_name='Product Name', max_length=255)
     slug = models.CharField(null=True, editable=False, max_length=255, unique=True)
     description = models.CharField(null=True, blank=True, max_length=1024)
     price = models.FloatField()
@@ -45,10 +45,10 @@ class Product(models.Model):
     rating = models.FloatField()
 
     def __str__(self, *args, **kwargs):
-        return self.product
+        return self.name
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.product)
+        self.slug = slugify(self.name)
         if not self.description: self.description = 'This product does not have a description yet.'
         return super(Product, self).save(*args, **kwargs)
 
@@ -101,7 +101,7 @@ class Review(models.Model):
     review = models.CharField(null=True, blank=True, max_length=1024)
 
     def __str__(self):
-        return f"{self.user.username}'s Rating on {self.product.product}"
+        return f"{self.user.username}'s Rating on {self.product.name}"
 
 @receiver(models.signals.post_save, sender=Review)
 @receiver(models.signals.post_delete, sender=Review)

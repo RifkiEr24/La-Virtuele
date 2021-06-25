@@ -3,7 +3,7 @@ from .models import Gallery, Product, Review, Category, ProductCart, Cart
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('product', 'slug', 'price', 'is_featured', 'rating')
+    list_display = ('name', 'slug', 'price', 'is_featured', 'rating')
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):

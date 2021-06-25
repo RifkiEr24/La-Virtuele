@@ -5,7 +5,6 @@ from rest_framework import serializers
 from product.models import Cart, Gallery, Product, ProductCart, Review, SIZE_CHOICES, Category
 
 class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='category')
     class Meta:
         model = Category
         fields = ('name',)
@@ -34,7 +33,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('product', 'slug', 'description', 'price', 'material', 'category', 'is_featured', 'model', 'gallery')
+        fields = ('name', 'slug', 'description', 'price', 'material', 'category', 'is_featured', 'model', 'gallery')
 
 class CreateProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,7 +61,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def get_product(self, review):
         product = Product.objects.get(id=review.product.id)
-        return {'name': product.product, 'slug': product.slug, 'rating':product.rating}
+        return {'name': product.name, 'slug': product.slug, 'rating':product.rating}
 
     class Meta:
         model = Review
