@@ -17,6 +17,7 @@
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
     "vue": "^2.6.11",
     "vue-axios": "^3.2.4",
+    "vue-inner-image-zoom": "^1.1.0",
     "vue-page-transition": "^0.2.2",
     "vue-router": "^3.2.0",
     "vue-slick-carousel": "^1.0.6",
