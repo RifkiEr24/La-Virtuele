@@ -188,8 +188,8 @@ class ProductReviews(APIView):
         """
         Get Review(s)
         
-        Return a list of reviews for product with mentioned slug.
-        Return 404 if no product with that slug is found.
+        Return a list of reviews for product with mentioned slug.<br>
+        Return 404 if no product with that slug is found.<br>
         """
 
         reviews = Review.objects.filter(product__slug=slug)
@@ -210,10 +210,11 @@ class ProductReviews(APIView):
         """
         Create Review
 
-        Create a review for product with mentioned slug, the author will be automatically the requesting user.
-        Return 401 if you the request are not authenticated (user aren't logged in).
-        Return 404 if no product with that slug is found.
-        Return 409 if you rty to review a product using a same user more than once.
+        Create a review for product with mentioned slug, the author will be automatically the requesting user.<br>
+        Each user can only review one product once.<br>
+        Return 401 if request are not authenticated (user aren't logged in).<br>
+        Return 404 if no product with that slug is found.<br>
+        Return 409 if you rty to review a product using a same user more than once.<br>
         """
 
         product = get_object_or_404(Product, slug=slug)
@@ -228,10 +229,10 @@ class ProductReviews(APIView):
         """
         Delete Review
         
-        Delete a review for product with mentioned slug, the author will be automatically the requesting user.
-        Return 204 if review successfully deleted.
-        Return 401 if you the request are not authenticated (user aren't logged in).
-        Return 404 if no product with that slug is found or user haven't made any review for that product yet.
+        Delete a review for product with mentioned slug, the author will be automatically the requesting user.<br>
+        Return 204 if review successfully deleted.<br>
+        Return 401 if request are not authenticated (user aren't logged in).<br>
+        Return 404 if no product with that slug is found or user haven't made any review for that product yet.<br>
         """
 
         get_object_or_404(Review, product__slug=slug, user=request.user).delete()
