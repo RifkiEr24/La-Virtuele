@@ -16,9 +16,11 @@
     "register-service-worker": "^1.7.1",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
     "vue": "^2.6.11",
+    "vue-axios": "^3.2.4",
     "vue-page-transition": "^0.2.2",
     "vue-router": "^3.2.0",
-    "vue-slick-carousel": "^1.0.6"
+    "vue-slick-carousel": "^1.0.6",
+    "vue2-transitions": "^0.3.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

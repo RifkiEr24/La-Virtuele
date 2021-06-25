@@ -755,6 +755,7 @@ module.exports = {
       '-2/4': '-50%',
       '-3/4': '-75%',
       '-full': '-100%',
+      'nav-translate':'68rem'
     }),
     width: (theme) => ({
       auto: 'auto',
