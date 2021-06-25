@@ -27,9 +27,10 @@ class Category(models.Model):
 class Product(models.Model):
     product = models.CharField(verbose_name='Product Name', max_length=255)
     slug = models.CharField(null=True, editable=False, max_length=255, unique=True)
+    description = models.CharField(null=True, blank=True, max_length=1024)
     price = models.FloatField()
     category = models.ManyToManyField(Category, related_name='product')
-    material = models.TextField(max_length=255, default="")
+    material = models.TextField(null=True, blank=True, max_length=255, default="")
     is_featured = models.BooleanField(default=False)
 
     def __str__(self, *args, **kwargs):
@@ -37,6 +38,7 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.product)
+        if not self.description: self.description = 'This product does not have a description yet.'
         return super(Product, self).save(*args, **kwargs)
 
 @receiver(models.signals.post_save, sender=Product)
