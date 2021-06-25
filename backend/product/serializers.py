@@ -1,10 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.db.models.query import Prefetch
 from django.db.models.query_utils import Q
 from rest_framework import serializers
-from product.models import Cart, Gallery, Product, ProductCart, SIZE_CHOICES, Category
+from product.models import Cart, Gallery, Product, ProductCart, Review, SIZE_CHOICES, Category
 
 class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='category')
     class Meta:
         model = Category
         fields = ('name',)
@@ -33,7 +33,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('product', 'slug', 'price', 'material', 'category', 'is_featured', 'model', 'gallery')
+        fields = ('name', 'slug', 'description', 'price', 'material', 'rating', 'is_featured', 'category', 'model', 'gallery')
 
 class CreateProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,6 +45,27 @@ class CreateProductSerializer(serializers.ModelSerializer):
         product = Product.objects.create(**validated_data)
         product.category.add(*categories)
         return product
+
+class CreateReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ('rating', 'review')
+
+class ReviewSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    product = serializers.SerializerMethodField()
+
+    def get_user(self, review):
+        user = get_user_model().objects.get(id=review.user.id)
+        return {'username': user.username, 'email': user.email}
+
+    def get_product(self, review):
+        product = Product.objects.get(id=review.product.id)
+        return {'name': product.name, 'slug': product.slug, 'rating':product.rating}
+
+    class Meta:
+        model = Review
+        fields = ('user', 'product', 'rating', 'review')
 
 class ProductCartSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)

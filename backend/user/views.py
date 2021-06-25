@@ -1,11 +1,15 @@
+from user.permissions import IsActive
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from user.serializers import VirtueleTokenObtainPairSerializer
+from product.models import Review
+from product.serializers import ReviewSerializer
 
 class VirtueleTokenObtainPairView(TokenObtainPairView):
     """
@@ -58,3 +62,31 @@ class VirtueleTokenRefreshView(TokenRefreshView):
             raise InvalidToken(args[0])
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+class UserReviews(APIView):
+    permission_classes = [IsActive]
+
+    @swagger_auto_schema(
+        responses={
+            200: ReviewSerializer(many=True),
+            204: 'No Content',
+            401: 'Invalid User\'s Credential',
+        }
+    )
+    def get(self, request):
+        """
+        User's Reviews
+
+        Return a list of user's review.
+        Return 401 if you the request are not authenticated (user aren't logged in).
+        """
+        reviews = Review.objects.filter(user=request.user)
+
+        if request.GET.get('product'):
+            reviews.filter(product__slug=request.GET.get('product'))
+
+        if not reviews:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
