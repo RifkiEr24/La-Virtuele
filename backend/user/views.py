@@ -78,11 +78,12 @@ class UserReviews(APIView):
         """
         User Reviews
 
-        Return a list of requesting user's review.
-        Return 401 if you the request are not authenticated (user aren't logged in).
+        Return a list of user's reviews with mentioned ID.
+        Return 401 if the request are not authenticated (user aren't logged in).
         You can set a GET parameter list to filter the result.<br>
         **product**: Returned review will be on product with mentioned slug only.
         """
+        
         reviews = Review.objects.filter(user__id=id)
 
         if request.GET.get('product'):
@@ -109,10 +110,11 @@ class MyReviews(APIView):
         My Reviews
 
         Return a list of requesting user's review.
-        Return 401 if you the request are not authenticated (user aren't logged in).
+        Return 401 if the request are not authenticated (user aren't logged in).
         You can set a GET parameter list to filter the result.<br>
         **product**: Returned review will be on product with mentioned slug only.
         """
+
         reviews = Review.objects.filter(user=request.user)
 
         if request.GET.get('product'):
