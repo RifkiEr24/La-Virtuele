@@ -7,7 +7,7 @@ from product.models import Cart, Gallery, Product, ProductCart, Review, SIZE_CHO
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('name',)
+        fields = ('name', 'id')
 
 class GallerySerializer(serializers.ModelSerializer):
     product = serializers.StringRelatedField()

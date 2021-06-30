@@ -7,7 +7,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('user', 'product', 'rating')
+    list_display = ('user', 'product', 'rating', 'date')
     list_filter = ('user', 'product')
 
 @admin.register(Gallery)

@@ -32,17 +32,17 @@ class Category(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self, *args, **kwargs):
-        return self.category
+        return self.name
 
 class Product(models.Model):
     name = models.CharField(verbose_name='Product Name', max_length=255)
     slug = models.CharField(null=True, editable=False, max_length=255, unique=True)
     description = models.CharField(null=True, blank=True, max_length=1024)
-    price = models.FloatField()
+    price = models.FloatField(null=True, blank=True, default=0)
     category = models.ManyToManyField(Category, related_name='product')
     material = models.TextField(null=True, blank=True, max_length=255, default='')
-    is_featured = models.BooleanField(default=False)
-    rating = models.FloatField()
+    is_featured = models.BooleanField(null=True, blank=True, default=False)
+    rating = models.FloatField(null=True, blank=True, default=0)
 
     def __str__(self, *args, **kwargs):
         return self.name
@@ -99,6 +99,7 @@ class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='review')
     rating = models.IntegerField(choices=RATING_CHOICES)
     review = models.CharField(null=True, blank=True, max_length=1024)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.username}'s Rating on {self.product.name}"
