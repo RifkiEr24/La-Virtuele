@@ -1,8 +1,8 @@
-from product.models import Cart, Gallery, Product, ProductCart, Review
+from product.models import Cart, Category, Gallery, Product, ProductCart, Review
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, ParseError
-from product.serializers import CartSerializer, CreateProductSerializer, CreateReviewSerializer, GallerySerializer, ProductSerializer, ReviewSerializer
+from product.serializers import CartSerializer, CategorySerializer, CreateProductSerializer, CreateReviewSerializer, GallerySerializer, ProductSerializer, ReviewSerializer
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from user.permissions import IsActive, IsActiveOrReadOnly, IsStaffOrReadOnly
@@ -10,6 +10,126 @@ from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny
 from drf_yasg import openapi
+from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin, CreateModelMixin
+from rest_framework.generics import GenericAPIView, ListCreateAPIView
+
+class Categories(ListModelMixin,
+                CreateModelMixin,
+                GenericAPIView):
+
+    permission_classes = [IsStaffOrReadOnly]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    @swagger_auto_schema(
+        responses={
+            200: CategorySerializer(),
+            204: 'No Content'
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        """
+        Category List
+
+        Return all available category.<br>
+        Will use 204 status code if result is empty.
+
+        ### Permission:
+        * Allow Any
+        """
+
+        qs = self.list(request, *args, **kwargs)
+        return qs if qs.data else Response(status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
+        responses={
+            201: CategorySerializer(),
+            400: 'Bad Request',
+            401: 'Invalid User\'s Credential',
+            403: 'You Do Not Have Permission To Perform This Action'
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        """
+        Create Category
+
+        Create a new category.
+
+        ### Permission:
+        * Staff Only
+        """
+
+        return self.create(request, *args, **kwargs)
+
+class CategoryDetail(RetrieveModelMixin,
+                    UpdateModelMixin,
+                    DestroyModelMixin,
+                    GenericAPIView):
+
+    permission_classes = [IsStaffOrReadOnly]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    @swagger_auto_schema(
+        responses={
+            200: CategorySerializer(),
+            404: 'No Category With That ID Found'
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        """
+        Detail Category
+
+        Return the detail of category with requested id.<br>
+        Return 404 if no category with that id is found.
+
+        ### Permission:
+        * Allow Any
+        """
+        return self.retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        request_body=CategorySerializer(),
+        responses={
+            200: CategorySerializer(),
+            400: 'Bad Request',
+            401: 'Invalid User\'s Credential',
+            403: 'You Do Not Have Permission To Perform This Action',
+            404: 'No Category With That ID Found'
+        }
+    )
+    def put(self, request, *args, **kwargs):
+        """
+        Update Category
+
+        Update category that the id mentioned, returned the updated category if succesfull.<br>
+        Return 404 if no category with that id is found.
+
+        ### Permission:
+        * Staff Only
+        """
+        return self.update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        responses={
+            204: 'Category Succesfully Deleted',
+            400: 'Bad Request',
+            401: 'Invalid User\'s Credential',
+            403: 'You Do Not Have Permission To Perform This Action',
+            404: 'No Category With That ID Found'
+        }
+    )
+    def delete(self, request, *args, **kwargs):
+        """
+        Delete Category
+
+        Delete category that the id mentioned, then returned 204 if succesfull.<br>
+        Return 404 if no category with that id is found.
+
+        ### Permission:
+        * Staff Only
+        """
+        return self.destroy(request, *args, **kwargs)
 
 class Products(APIView):
 
@@ -25,18 +145,36 @@ class Products(APIView):
         """
         Product List
 
-        Return all available product. You can set a GET parameter to filter the result.<br>
+        Return all available product. You can set a query parameters to filter the result.<br>
 
-        GET parameter list:<br>
-        **featured**: If set to 'true' will only return featured products
+        ### Valid query parameter list:<br>
+        **featured**: If set to 'true' will only return featured products, if set to 'false' will do the opposite.<br>
+        **category**: Expected a category's ID, 
+        if properly set will only return product that contain category with mentioned ID.<br>
+
+        ### Example request:<br>
+        ```
+        /api/v1/products/?category=1&featured=true
+        ```
         """
 
         product_qs = Product.objects.all()
-        product_qs = product_qs.filter(is_featured=True) if request.GET.get('featured') == 'true' else product_qs
-        products = [product for product in product_qs]
 
+        # If featured parameter is set to either true or false,
+        # filter the queryset first to the desired featured value
+        if request.GET.get('featured') in ['true', 'false']:
+            featured = True if request.GET.get('featured') == 'true' else False
+            product_qs = product_qs.filter(is_featured=featured)
+
+        # If category parameter is set,
+        # check if the product have that category first before appending them to the list
+        if request.GET.get('category'):
+            products = [product for product in product_qs if product.category.filter(id=request.GET.get('category'))]
+        else:
+            products = [product for product in product_qs]
+
+        # Return early with no content (204) if queryset is empty
         if not products:
-            # Return early with no content (204) if no queryset found
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         serializer = ProductSerializer(products, many=True)
@@ -47,14 +185,16 @@ class Products(APIView):
         responses={
             201: openapi.Schema(type=openapi.TYPE_OBJECT, properties={'detail': 'Message', 'id': 'Product\'s ID', 'slug': 'Product\'s Slug'}),
             400: 'Bad Request',
-            401: 'Invalid User\'s Credential'
+            401: 'Invalid User\'s Credential',
+            403: 'You Do Not Have Permission To Perform This Action'
         }
     )
     def post(self, request):
         """
         Create Product
 
-        A staff account is needed to request this endpoint, else 401
+        A staff account is needed to request this endpoint.<br>
+        Otherwise, if user is not authenticated return 401 but if user is authenticated but is not a staff account return 403.<br>
         """
 
         serializer = CreateProductSerializer(data=request.data)
@@ -99,6 +239,7 @@ class ProductDetail(APIView):
         return Response(serializer.data)
 
     @swagger_auto_schema(
+        request_body=CreateProductSerializer(),
         responses={
             200: ProductSerializer(),
             400: 'Bad Request',
@@ -106,7 +247,7 @@ class ProductDetail(APIView):
             409: 'Some Unique Field(e.g username) Conflicted'
         }
     )
-    def patch(self, request, slug):
+    def put(self, request, slug):
         """
         Update Product
 
@@ -188,8 +329,8 @@ class ProductReviews(APIView):
         """
         Get Review(s)
         
-        Return a list of reviews for product with mentioned slug.
-        Return 404 if no product with that slug is found.
+        Return a list of reviews for product with mentioned slug.<br>
+        Return 404 if no product with that slug is found.<br>
         """
 
         reviews = Review.objects.filter(product__slug=slug)
@@ -210,10 +351,11 @@ class ProductReviews(APIView):
         """
         Create Review
 
-        Create a review for product with mentioned slug, the author will be automatically the requesting user.
-        Return 401 if you the request are not authenticated (user aren't logged in).
-        Return 404 if no product with that slug is found.
-        Return 409 if you rty to review a product using a same user more than once.
+        Create a review for product with mentioned slug, the author will be automatically the requesting user.<br>
+        Each user can only review one product once.<br>
+        Return 401 if request are not authenticated (user aren't logged in).<br>
+        Return 404 if no product with that slug is found.<br>
+        Return 409 if you rty to review a product using a same user more than once.<br>
         """
 
         product = get_object_or_404(Product, slug=slug)
@@ -228,10 +370,10 @@ class ProductReviews(APIView):
         """
         Delete Review
         
-        Delete a review for product with mentioned slug, the author will be automatically the requesting user.
-        Return 204 if review successfully deleted.
-        Return 401 if you the request are not authenticated (user aren't logged in).
-        Return 404 if no product with that slug is found or user haven't made any review for that product yet.
+        Delete a review for product with mentioned slug, the author will be automatically the requesting user.<br>
+        Return 204 if review successfully deleted.<br>
+        Return 401 if request are not authenticated (user aren't logged in).<br>
+        Return 404 if no product with that slug is found or user haven't made any review for that product yet.<br>
         """
 
         get_object_or_404(Review, product__slug=slug, user=request.user).delete()
