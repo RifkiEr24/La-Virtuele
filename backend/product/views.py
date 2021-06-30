@@ -10,31 +10,125 @@ from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny
 from drf_yasg import openapi
-from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
+from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin, CreateModelMixin
 from rest_framework.generics import GenericAPIView, ListCreateAPIView
 
-class Categories(ListCreateAPIView):
-    queryset = Category.objects.all()
-    permission_classes = [IsStaffOrReadOnly]
-    serializer_class = CategorySerializer
-
-class CategoryDetail(
-    RetrieveModelMixin,
-    UpdateModelMixin,
-    DestroyModelMixin,
-    GenericAPIView):
+class Categories(ListModelMixin,
+                CreateModelMixin,
+                GenericAPIView):
 
     permission_classes = [IsStaffOrReadOnly]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
+    @swagger_auto_schema(
+        responses={
+            200: CategorySerializer(),
+            204: 'No Content'
+        }
+    )
     def get(self, request, *args, **kwargs):
+        """
+        Category List
+
+        Return all available category.<br>
+        Will use 204 status code if result is empty.
+
+        ### Permission:
+        * Allow Any
+        """
+
+        qs = self.list(request, *args, **kwargs)
+        return qs if qs.data else Response(status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
+        responses={
+            201: CategorySerializer(),
+            400: 'Bad Request',
+            401: 'Invalid User\'s Credential',
+            403: 'You Do Not Have Permission To Perform This Action'
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        """
+        Create Category
+
+        Create a new category.
+
+        ### Permission:
+        * Staff Only
+        """
+
+        return self.create(request, *args, **kwargs)
+
+class CategoryDetail(RetrieveModelMixin,
+                    UpdateModelMixin,
+                    DestroyModelMixin,
+                    GenericAPIView):
+
+    permission_classes = [IsStaffOrReadOnly]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    @swagger_auto_schema(
+        responses={
+            200: CategorySerializer(),
+            404: 'No Category With That ID Found'
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        """
+        Detail Category
+
+        Return the detail of category with requested id.<br>
+        Return 404 if no category with that id is found.
+
+        ### Permission:
+        * Allow Any
+        """
         return self.retrieve(request, *args, **kwargs)
 
+    @swagger_auto_schema(
+        request_body=CategorySerializer(),
+        responses={
+            200: CategorySerializer(),
+            400: 'Bad Request',
+            401: 'Invalid User\'s Credential',
+            403: 'You Do Not Have Permission To Perform This Action',
+            404: 'No Category With That ID Found'
+        }
+    )
     def put(self, request, *args, **kwargs):
+        """
+        Update Category
+
+        Update category that the id mentioned, returned the updated category if succesfull.<br>
+        Return 404 if no category with that id is found.
+
+        ### Permission:
+        * Staff Only
+        """
         return self.update(request, *args, **kwargs)
 
+    @swagger_auto_schema(
+        responses={
+            204: 'Category Succesfully Deleted',
+            400: 'Bad Request',
+            401: 'Invalid User\'s Credential',
+            403: 'You Do Not Have Permission To Perform This Action',
+            404: 'No Category With That ID Found'
+        }
+    )
     def delete(self, request, *args, **kwargs):
+        """
+        Delete Category
+
+        Delete category that the id mentioned, then returned 204 if succesfull.<br>
+        Return 404 if no category with that id is found.
+
+        ### Permission:
+        * Staff Only
+        """
         return self.destroy(request, *args, **kwargs)
 
 class Products(APIView):
