@@ -1,11 +1,11 @@
-from product.models import Cart, Gallery, Product, ProductCart
+from product.models import Cart, Gallery, Product, ProductCart, Review
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, ParseError
-from product.serializers import CartSerializer, CreateProductSerializer, GallerySerializer, ProductSerializer
+from product.serializers import CartSerializer, CreateProductSerializer, CreateReviewSerializer, GallerySerializer, ProductSerializer, ReviewSerializer
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from user.permissions import IsActive, IsStaffOrReadOnly
+from user.permissions import IsActive, IsActiveOrReadOnly, IsStaffOrReadOnly
 from django.http import Http404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny
@@ -175,6 +175,69 @@ class GalleryList(APIView):
         serialize = GallerySerializer(gallery, many=True)
         return Response(serialize.data, status=status.HTTP_200_OK)
 
+class ProductReviews(APIView):
+    permission_classes = [IsActiveOrReadOnly]
+
+    @swagger_auto_schema(
+        responses={
+            200: ReviewSerializer(many=True),
+            404: 'No Product With That Slug Found',
+        }
+    )
+    def get(self, request, slug):
+        """
+        Get Review(s)
+        
+        Return a list of reviews for product with mentioned slug.
+        Return 404 if no product with that slug is found.
+        """
+
+        reviews = Review.objects.filter(product__slug=slug)
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        request_body=CreateReviewSerializer(),
+        responses={
+            201: ReviewSerializer(),
+            400: 'Bad Request',
+            401: 'Invalid User\'s Credential',
+            404: 'No Product With That Slug Found',
+            409: 'This User Already Reviewed This Product'
+        }
+    )
+    def post(self, request, slug):
+        """
+        Create Review
+
+        Create a review for product with mentioned slug, the author will be automatically the requesting user.
+        Return 401 if you the request are not authenticated (user aren't logged in).
+        Return 404 if no product with that slug is found.
+        Return 409 if you rty to review a product using a same user more than once.
+        """
+
+        product = get_object_or_404(Product, slug=slug)
+        try:
+            review = Review.objects.create(user=request.user, product=product, **request.data)
+        except ValidationError as e:
+            return Response({'detail': e.detail[0] or 'Unknown error, please check logs'}, status=e.get_codes()[0] or 400)
+        
+        return Response(ReviewSerializer(review).data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, slug):
+        """
+        Delete Review
+        
+        Delete a review for product with mentioned slug, the author will be automatically the requesting user.
+        Return 204 if review successfully deleted.
+        Return 401 if you the request are not authenticated (user aren't logged in).
+        Return 404 if no product with that slug is found or user haven't made any review for that product yet.
+        """
+
+        get_object_or_404(Review, product__slug=slug, user=request.user).delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 class Carts(APIView):
     """
     Cart List
@@ -200,6 +263,7 @@ class Carts(APIView):
     def get(self, request):
         user = request.user
         cart_qs = Cart.objects.filter(user__username=user)
+        cart_condition = None
         if request.GET.get('checked') == 'true':
             cart_condition = True
         elif request.GET.get('checked') == 'false':
