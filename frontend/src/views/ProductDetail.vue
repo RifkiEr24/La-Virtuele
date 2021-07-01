@@ -19,7 +19,7 @@
           <div v-for="image in product.gallery" :key="image.id">
             <inner-image-zoom :src="`https://la-virtuele.harizmunawar.repl.co${image.image}`"
               :zoomSrc="`https://la-virtuele.harizmunawar.repl.co${image.image}`" :zoomScale="0.1"
-              :zoomType="'hover'" />
+             />
           </div>
 
 
@@ -34,7 +34,7 @@
         </VueSlickCarousel>
       </div>
       <div class="w-full md:w-4/12 px-2">
-        <div class="w-72 ml-auto">
+        <div class=" w-full md:w-72  ml-0 md:ml-auto">
           <bordered-heading :heading-text="'Size'" />
           <label class="container my-3">S
             <input type="radio" name="size-select" checked="checked">
@@ -72,6 +72,10 @@
         </div>
       </div>
     </div>
+    <div class="review pb-10">
+       <bordered-heading class="mt-10" :heading-text="'Review'" />
+       <review-item class="my-8"/>
+    </div>
   </div>
 </template>
 
@@ -80,12 +84,15 @@ import SecondaryButton from '@/components/SecondaryButton.vue';
 import InnerImageZoom from 'vue-inner-image-zoom';
 import VueSlickCarousel from 'vue-slick-carousel'
 import BorderedHeading from '@/components/BorderedHeading.vue'
+import ReviewItem from '@/components/ReviewItem.vue'
+
 import 'vue-inner-image-zoom/lib/vue-inner-image-zoom.css';
 
 export default {
 components: {
   VueSlickCarousel,
    SecondaryButton,
+   ReviewItem,
    'inner-image-zoom': InnerImageZoom,
    BorderedHeading
   },
