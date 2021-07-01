@@ -3,7 +3,7 @@
     <secondary-button
       btn-text='<span class="iconify" data-icon="bx:bxs-chevron-left" data-inline="false"></span>' />
     <div class="flex flex-wrap -mx-2 mt-10">
-      <div class="w-full md:w-4/12 px-2">
+      <div class="w-full md:w-4/12 px-2 order-2 md:order-1">
         <h1 class="text-5xl font-bold header text-graysecondary tracking-wide">{{product.name}}</h1>
         <p class="text-primary  text-xl font-semibold">Rp {{product.price}}</p>
         <div class="info mt-20">
@@ -14,7 +14,7 @@
             irure dolor in</p>
         </div>
       </div>
-      <div class="w-full md:w-4/12 px-2">
+      <div class="w-full md:w-4/12 px-2 order-1 md:order-2">
         <VueSlickCarousel ref="c1" :asNavFor="$refs.c2" :slidesToShow="1">
           <div v-for="image in product.gallery" :key="image.id">
             <inner-image-zoom :src="`https://la-virtuele.harizmunawar.repl.co${image.image}`"
@@ -33,7 +33,7 @@
           </div>
         </VueSlickCarousel>
       </div>
-      <div class="w-full md:w-4/12 px-2">
+      <div class="w-full md:w-4/12 px-2 order-3" >
         <div class=" w-full md:w-72  ml-0 md:ml-auto">
           <bordered-heading :heading-text="'Size'" />
           <label class="container my-3">S
@@ -75,6 +75,7 @@
     <div class="review pb-10">
        <bordered-heading class="mt-10" :heading-text="'Review'" />
        <review-item class="my-8"/>
+       
     </div>
   </div>
 </template>
@@ -134,7 +135,6 @@ data(){
   display: block;
   position: relative;
   padding-left: 35px;
-  cursor: pointer;
   font-size: 18px;
   -webkit-user-select: none;
   -moz-user-select: none;

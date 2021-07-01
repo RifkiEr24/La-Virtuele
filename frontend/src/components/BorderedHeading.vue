@@ -1,5 +1,5 @@
 <template>
-  <div class="border-2 border-black header text-4xl p-2 pl-8">{{headingText}}</div>
+  <div class="border-2 border-black header text-3xl p-2 pl-8">{{headingText}}</div>
 </template>
 
 <script>
