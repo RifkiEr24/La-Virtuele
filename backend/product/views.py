@@ -2,7 +2,7 @@ from product.models import Cart, Category, Gallery, Product, ProductCart, Review
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, ParseError
-from product.serializers import CartSerializer, CategorySerializer, CreateProductSerializer, CreateReviewSerializer, GallerySerializer, ProductSerializer, ReviewSerializer
+from product.serializers import CartSerializer, CategorySerializer, CreateProductSerializer, CreateReviewSerializer, GallerySerializer, ProductReviewSerializer, ProductSerializer, ReviewSerializer
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from user.permissions import IsActive, IsActiveOrReadOnly, IsStaffOrReadOnly
@@ -222,7 +222,7 @@ class ProductDetail(APIView):
 
     @swagger_auto_schema(
         responses={
-            200: ProductSerializer(),
+            200: ProductReviewSerializer(),
             404: 'No Product With That Slug Found'
         }
     )
@@ -235,7 +235,7 @@ class ProductDetail(APIView):
         """
 
         product = self.get_object(slug)
-        serializer = ProductSerializer(product)
+        serializer = ProductReviewSerializer(product)
         return Response(serializer.data)
 
     @swagger_auto_schema(
@@ -327,7 +327,7 @@ class ProductReviews(APIView):
     )
     def get(self, request, slug):
         """
-        Get Review(s)
+        Review List
         
         Return a list of reviews for product with mentioned slug.<br>
         Return 404 if no product with that slug is found.<br>
