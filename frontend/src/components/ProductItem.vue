@@ -37,7 +37,6 @@ props:{
         required:true
     },
     nameProduct:{
-        type: String,
         required:true
     },
     priceProduct:{
