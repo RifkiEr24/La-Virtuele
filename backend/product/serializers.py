@@ -1,11 +1,9 @@
 from user.serializers import SimpleUserSerializer
 from django.contrib.auth import get_user_model
-from django.db.models.query import Prefetch
 from django.db.models.query_utils import Q
 from rest_framework import serializers
-from product.models import Cart, Gallery, Product, ProductCart, Review, SIZE_CHOICES, Category
+from product.models import Gallery, Product, Review, SIZE_CHOICES, Category
 from drf_yasg.utils import swagger_serializer_method
-from djoser.conf import settings
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -94,15 +92,3 @@ class ProductReviewSerializer(ProductSerializer):
     class Meta:
         model = Product
         fields = ('name', 'slug', 'description', 'price', 'material', 'rating', 'is_featured', 'category', 'model', 'gallery', 'review')
-
-class ProductCartSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
-    class Meta:
-        model = ProductCart
-        fields = ('product', 'qty', 'size', 'subtotal')
-
-class CartSerializer(serializers.ModelSerializer):
-    products = ProductCartSerializer(read_only=True, many=True)
-    class Meta:
-        model = Cart
-        fields = ('__all__')
