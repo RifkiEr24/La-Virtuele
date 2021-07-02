@@ -13,13 +13,13 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('name', 'id')
 
 class GallerySerializer(serializers.ModelSerializer):
-    product = serializers.StringRelatedField()
-    type = serializers.CharField(source='get_image_type_display')
-    type_code = serializers.CharField(source='image_type')
+    product_slug = serializers.CharField(source='product__slug', allow_blank=True, required=False)
+    type = serializers.CharField(source='get_image_type_display', allow_blank=True, required=False)
+    type_code = serializers.CharField(source='image_type', allow_blank=True, required=False)
     
     class Meta:
         model = Gallery
-        fields = ('image', 'width', 'height', 'product', 'type', 'type_code')
+        fields = ('image', 'width', 'height', 'product_slug', 'type', 'type_code')
 
 class CreateProductSerializer(serializers.ModelSerializer):
     class Meta:
