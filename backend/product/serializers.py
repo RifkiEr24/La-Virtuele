@@ -1,8 +1,9 @@
+from user.serializers import SimpleUserSerializer
 from django.contrib.auth import get_user_model
-from django.db.models.query import Prefetch
 from django.db.models.query_utils import Q
 from rest_framework import serializers
-from product.models import Cart, Gallery, Product, ProductCart, Review, SIZE_CHOICES, Category
+from product.models import Gallery, Product, Review, SIZE_CHOICES, Category
+from drf_yasg.utils import swagger_serializer_method
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,30 +11,13 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('name', 'id')
 
 class GallerySerializer(serializers.ModelSerializer):
-    product = serializers.StringRelatedField()
-    type = serializers.CharField(source='get_image_type_display')
-    type_code = serializers.CharField(source='image_type')
+    product_slug = serializers.CharField(source='product__slug', allow_blank=True, required=False)
+    type = serializers.CharField(source='get_image_type_display', allow_blank=True, required=False)
+    type_code = serializers.CharField(source='image_type', allow_blank=True, required=False)
     
     class Meta:
         model = Gallery
-        fields = ('image', 'width', 'height', 'product', 'type', 'type_code')
-
-class ProductSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True, many=True)
-    gallery = serializers.SerializerMethodField()
-    model = serializers.SerializerMethodField()
-
-    def get_gallery(self, product):
-        qs = Gallery.objects.filter(product=product).exclude(image_type='M')
-        return GallerySerializer(instance=qs, many=True).data
-
-    def get_model(self, product):
-        qs = Gallery.objects.filter(image_type='M', product=product)
-        return GallerySerializer(instance=qs, many=True).data
-
-    class Meta:
-        model = Product
-        fields = ('name', 'slug', 'description', 'price', 'material', 'rating', 'is_featured', 'category', 'model', 'gallery')
+        fields = ('image', 'width', 'height', 'product_slug', 'type', 'type_code')
 
 class CreateProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,6 +30,29 @@ class CreateProductSerializer(serializers.ModelSerializer):
         product.category.add(*categories)
         return product
 
+class ProductSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True, many=True)
+    gallery = serializers.SerializerMethodField()
+    model = serializers.SerializerMethodField()
+
+    @swagger_serializer_method(serializer_or_field=GallerySerializer(many=True))
+    def get_gallery(self, product):
+        qs = Gallery.objects.filter(product=product).exclude(image_type='M')
+        return GallerySerializer(instance=qs, many=True).data
+
+    @swagger_serializer_method(serializer_or_field=GallerySerializer(many=True))
+    def get_model(self, product):
+        qs = Gallery.objects.filter(image_type='M', product=product)
+        return GallerySerializer(instance=qs, many=True).data
+
+    class Meta:
+        model = Product
+        fields = ('name', 'slug', 'description', 'price', 'material', 'rating', 'is_featured', 'category', 'model', 'gallery')
+
+class SimpleProductSerializer(ProductSerializer):
+    class Meta:
+        model = Product
+        fields = ('name', 'slug', 'rating')
 class CreateReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
@@ -55,26 +62,33 @@ class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     product = serializers.SerializerMethodField()
 
+    @swagger_serializer_method(serializer_or_field=SimpleUserSerializer)
     def get_user(self, review):
         user = get_user_model().objects.get(id=review.user.id)
         return {'username': user.username, 'email': user.email}
 
+    @swagger_serializer_method(serializer_or_field=SimpleProductSerializer)
     def get_product(self, review):
         product = Product.objects.get(id=review.product.id)
-        return {'name': product.name, 'slug': product.slug, 'rating':product.rating}
+        return SimpleProductSerializer(instance=product).data
 
     class Meta:
         model = Review
         fields = ('user', 'product', 'rating', 'review')
 
-class ProductCartSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
+class SimpleReviewSerializer(ReviewSerializer):
     class Meta:
-        model = ProductCart
-        fields = ('product', 'qty', 'size', 'subtotal')
+        model = Review
+        fields = ('user', 'rating', 'review')
 
-class CartSerializer(serializers.ModelSerializer):
-    products = ProductCartSerializer(read_only=True, many=True)
+class ProductReviewSerializer(ProductSerializer):
+    review = serializers.SerializerMethodField()
+
+    @swagger_serializer_method(serializer_or_field=SimpleReviewSerializer(many=True))
+    def get_review(self, product):
+        qs = Review.objects.filter(product=product)
+        return SimpleReviewSerializer(instance=qs, many=True).data
+
     class Meta:
-        model = Cart
-        fields = ('__all__')
+        model = Product
+        fields = ('name', 'slug', 'description', 'price', 'material', 'rating', 'is_featured', 'category', 'model', 'gallery', 'review')

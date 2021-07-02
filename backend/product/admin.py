@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Gallery, Product, Review, Category, ProductCart, Cart
+from product.models import Gallery, Product, Review, Category
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -17,11 +17,3 @@ class GalleryAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     pass
-
-@admin.register(ProductCart)
-class ProductCartAdmin(admin.ModelAdmin):
-    readonly_fields = ('subtotal',)
-
-@admin.register(Cart)
-class CartAdmin(admin.ModelAdmin):
-    readonly_fields = ('total',)
