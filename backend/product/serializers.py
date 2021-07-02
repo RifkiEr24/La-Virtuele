@@ -78,13 +78,18 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = ('user', 'product', 'rating', 'review')
 
+class SimpleReviewSerializer(ReviewSerializer):
+    class Meta:
+        model = Review
+        fields = ('user', 'rating', 'review')
+
 class ProductReviewSerializer(ProductSerializer):
     review = serializers.SerializerMethodField()
 
-    @swagger_serializer_method(serializer_or_field=ReviewSerializer(many=True))
+    @swagger_serializer_method(serializer_or_field=SimpleReviewSerializer(many=True))
     def get_review(self, product):
         qs = Review.objects.filter(product=product)
-        return ReviewSerializer(instance=qs, many=True).data
+        return SimpleReviewSerializer(instance=qs, many=True).data
 
     class Meta:
         model = Product
