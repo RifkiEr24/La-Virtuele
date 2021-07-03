@@ -1,6 +1,6 @@
 <template>
        <button
-          class="text-white  bg-primary p-2 text-3xl transition duration-500" ref="button">
+          class="text-white  d-flex bg-primary p-2 header text-3xl transition duration-500" ref="button">
           </button>
 </template>
 
