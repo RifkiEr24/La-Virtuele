@@ -1,3 +1,4 @@
+from django.db.models.query_utils import Q
 from product.models import Category, Gallery, Product, Review
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,7 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny
 from drf_yasg import openapi
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin, CreateModelMixin
-from rest_framework.generics import GenericAPIView, ListCreateAPIView
+from rest_framework.generics import GenericAPIView
 
 class Categories(ListModelMixin,
                 CreateModelMixin,
@@ -130,6 +131,20 @@ class CategoryDetail(RetrieveModelMixin,
         * Staff Only
         """
         return self.destroy(request, *args, **kwargs)
+
+class CategoryProduct(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, pk):
+        products = Product.objects.filter(Q(category__id__icontains=pk))
+        serializer = ProductSerializer(products, many=True)
+
+        if not products:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    def post(self, request, slug, pk):
+        pass
 
 class Products(APIView):
 
@@ -379,3 +394,30 @@ class ProductReviews(APIView):
         get_object_or_404(Review, product__slug=slug, user=request.user).delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class ProductCategories(APIView):
+    permission_classes = [IsStaffOrReadOnly]
+
+    def post(self, request, slug, pk):
+        product = get_object_or_404(Product, slug=slug)
+        category = get_object_or_404(Category, id=pk)
+        product_category = [category.id for category in product.category.all()]
+
+        if category.id in product_category:
+            return Response({'message': 'This product already on this category'}, status.HTTP_400_BAD_REQUEST)
+    
+        product.category.add(category)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    def delete(self, request, slug, pk):
+        product = get_object_or_404(Product, slug=slug)
+        category = get_object_or_404(Category, id=pk)
+        product_category = [category.id for category in product.category.all()]
+
+        if not category.id in product_category:
+            return Response({'message': 'This product is not already on this category'}, status.HTTP_400_BAD_REQUEST)
+    
+        product.category.remove(category)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data, status.HTTP_200_OK)

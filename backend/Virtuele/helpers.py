@@ -8,6 +8,7 @@ from random import randint
 
 class VirtueleTestBase(TestCase):
     random_word_list = ['apostils', 'estivate', 'rioted', 'doze', 'lexicalizing', 'driftier', 'reinjection', 'musician', 'endosperms', 'cummerbunds', 'masculinizing', 'fabbest', 'semicolonialism', 'fabulous', 'clearstory', 'rared', 'lawmaking', 'confronts', 'conquians', 'morulae', 'pinto', 'dropkicker', 'antisex', 'euryokous', 'outyell', 'reinvigorations', 'brainstormers', 'ogrish', 'grails', 'heaume', 'apollos', 'morselling', 'gausses', 'exostoses', 'degreed', 'castellans', 'gridlocking', 'twirling', 'ordures', 'glum', 'capitulate', 'skill', 'brigandines', 'hustles', 'monolayers', 'forceless', 'felsic', 'procurator', 'fetas', 'conventionalist', 'bitchier', 'hypothecators', 'sniffishnesses', 'resembling', 'wastefully', 'audaciousnesses', 'handfasting', 'woodnotes', 'checkreins', 'corduroys', 'airstrip', 'torturing', 'testify', 'frenziedly', 'iguanian', 'gluten', 'opuntia', 'renitent', 'caprocks', 'nonenergy', 'centralities', 'inamoratas', 'mischanneled', 'morale', 'psychologises', 'abridgment', 'cerebrating', 'tautness', 'stigmatizes', 'endothecium', 'doux', 'contusing', 'dystrophy', 'desirableness', 'hewers', 'putschists', 'financiered', 'roturiers', 'emotionalizes', 'stonewaller', 'measles', 'chertier', 'lignites', 'cosmopolitism', 'bridesmaids', 'sashing', 'denouncements', 'intellect', 'prototyping', 'sociologese']
+    
     def user_admin_factory(self):
         get_user_model().objects.create_user(email='admin@admin.com',
                                              password='admin',
