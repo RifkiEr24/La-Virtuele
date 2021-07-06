@@ -1,4 +1,4 @@
-from product.models import Category, Product
+from product.models import Category, Product, Review
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
@@ -23,9 +23,21 @@ class VirtueleTestBase(TestCase):
                                              username='punyUser',
                                              is_active=True)
 
-    def product_factory(self, n=5, category: list=None):
+    def account_factory(self, n=3):
+        for i in range(1, n):
+            get_user_model().objects.create_user(email=f'user{i}@user.com',
+                                                 password=f'user{i}',
+                                                 first_name='user',
+                                                 last_name={i},
+                                                 username=f'USER{i}',
+                                                 is_active=True)
+
+    def product_factory(self, n=5, category: list=None, with_reviews=False):
         if not category:
             category = [Category.objects.create(name='Placeholder Category').id]
+
+        if with_reviews:
+            self.user_admin_factory()
 
         category_count = len(category)
 
@@ -37,6 +49,25 @@ class VirtueleTestBase(TestCase):
                                        is_featured=(0 == i%2))
             p.category.add(Category.objects.get(id=randint(1, category_count)))
             p.save()
+
+            if with_reviews:
+                self.review_factory(product=[p], user=[user for user in get_user_model().objects.all()])
+
+    def review_factory(self, product: list=None, user: list=None):
+        if not product:
+            self.product_factory(n=5)
+            product = [product for product in Product.objects.all()]
+
+        if not user:
+            self.user_admin_factory()
+            user = [user for user in get_user_model().objects.all()]
+        user_count = len(user)
+        
+        for product in product:
+            Review.objects.create(user=user[randint(0, user_count-1)],
+                                  product=product,
+                                  rating=randint(1, 5),
+                                  review=' '.join([self.random_word_list[randint(0, 99)] for i in range(10)]).capitalize())
 
     def category_factory(self, n=5):
         for i in range(n):

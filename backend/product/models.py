@@ -118,8 +118,12 @@ def set_product_rating_ps(sender, instance, **kwargs):
 @receiver(models.signals.pre_save, sender=Review)
 def review_pre_save(sender, instance, **kwargs):
     review = Review.objects.filter(user=instance.user, product=instance.product)
+    
     if review and instance not in review:
         raise RESTValidationError('This user already reviewed this product', code=409)
 
+    if not instance.rating:
+        instance.rating = 0
+    
     if instance.rating > 5 or instance.rating < 1:
         raise RESTValidationError('Rating should be between 1-5', code=400)

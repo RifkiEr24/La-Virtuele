@@ -1,9 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.db.models.query_utils import Q
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from product.models import Category, Product
-from product.serializers import CategorySerializer, ProductSerializer
+from product.models import Category, Product, Review
+from product.serializers import CategorySerializer, ProductSerializer, ReviewSerializer
 from Virtuele.helpers import VirtueleTestBase
 
 class ProductCRUD(VirtueleTestBase):
@@ -283,3 +284,77 @@ class ProductCategoryCRUD(VirtueleTestBase):
                                     **self.admin_jwt)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, ProductSerializer(Product.objects.get(id=1)).data)
+
+class ProductReviewCRUD(VirtueleTestBase):
+    def setUp(self):
+        self.product_factory(with_reviews=True)
+        self.client = APIClient()
+
+    def test_get_reviews_from_a_product(self):
+        product = Product.objects.get(id=1)
+        reviews = ReviewSerializer(Review.objects.filter(product=product), many=True)
+
+        response = self.client.get(f'/api/v1/products/invalidslug/reviews/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        response = self.client.get(f'/api/v1/products/{product.slug}/reviews/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, reviews.data)
+
+        self.product_factory(n=1)
+        new_product = Product.objects.get(id=6)
+
+        response = self.client.get(f'/api/v1/products/{new_product.slug}/reviews/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_add_review_for_a_product(self):
+        product = Product.objects.get(id=1)
+
+        response = self.client.post(f'/api/v1/products/{product.slug}/reviews/',
+                                    {'rating': 5, 'review': 'Very Cool!'},
+                                    format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.post(f'/api/v1/products/invalidslug/reviews/',
+                                    {'rating': 5, 'review': 'Very Cool!'},
+                                    format='json',
+                                    **self.user_jwt)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        response = self.client.post(f'/api/v1/products/{product.slug}/reviews/',
+                                    {'rating': 8, 'review': 'Very Cool!'},
+                                    format='json',
+                                    **self.user_jwt)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(f'/api/v1/products/{product.slug}/reviews/',
+                                    {'rating': 5, 'review': 'Very Cool!'},
+                                    format='json',
+                                    **self.user_jwt)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.post(f'/api/v1/products/{product.slug}/reviews/',
+                                    {'rating': 5, 'review': 'Very Cool!'},
+                                    format='json',
+                                    **self.user_jwt)
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+    def test_delete_a_review_from_a_product(self):
+        self.product_factory(n=1)
+        product = Product.objects.get(id=6)
+        self.review_factory(product=[product], user=[get_user_model().objects.get(id=2)])
+
+        response = self.client.delete(f'/api/v1/products/{product.slug}/reviews/')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.delete(f'/api/v1/products/invalidslug/reviews/',
+                                      **self.user_jwt)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        response = self.client.delete(f'/api/v1/products/{product.slug}/reviews/',
+                                      **self.user_jwt)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        response = self.client.delete(f'/api/v1/products/{product.slug}/reviews/',
+                                      **self.user_jwt)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

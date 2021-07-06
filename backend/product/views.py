@@ -337,6 +337,7 @@ class ProductReviews(APIView):
     @swagger_auto_schema(
         responses={
             200: ReviewSerializer(many=True),
+            204: 'No Content',
             404: 'No Product With That Slug Found',
         }
     )
@@ -348,7 +349,12 @@ class ProductReviews(APIView):
         Return 404 if no product with that slug is found.<br>
         """
 
+        get_object_or_404(Product, slug=slug)
         reviews = Review.objects.filter(product__slug=slug)
+
+        if not reviews:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data)
 
