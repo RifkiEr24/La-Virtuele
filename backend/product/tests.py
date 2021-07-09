@@ -309,6 +309,7 @@ class ProductReviewCRUD(VirtueleTestBase):
 
     def test_add_review_for_a_product(self):
         product = Product.objects.get(id=1)
+        self.account_factory(n=1)
 
         response = self.client.post(f'/api/v1/products/{product.slug}/reviews/',
                                     {'rating': 5, 'review': 'Very Cool!'},
@@ -318,25 +319,25 @@ class ProductReviewCRUD(VirtueleTestBase):
         response = self.client.post(f'/api/v1/products/invalidslug/reviews/',
                                     {'rating': 5, 'review': 'Very Cool!'},
                                     format='json',
-                                    **self.user_jwt)
+                                    **self.account_jwt(id=3))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         response = self.client.post(f'/api/v1/products/{product.slug}/reviews/',
                                     {'rating': 8, 'review': 'Very Cool!'},
                                     format='json',
-                                    **self.user_jwt)
+                                    **self.account_jwt(id=3))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         response = self.client.post(f'/api/v1/products/{product.slug}/reviews/',
                                     {'rating': 5, 'review': 'Very Cool!'},
                                     format='json',
-                                    **self.user_jwt)
+                                    **self.account_jwt(id=3))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         response = self.client.post(f'/api/v1/products/{product.slug}/reviews/',
                                     {'rating': 5, 'review': 'Very Cool!'},
                                     format='json',
-                                    **self.user_jwt)
+                                    **self.account_jwt(id=3))
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
     def test_delete_a_review_from_a_product(self):

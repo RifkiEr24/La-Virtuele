@@ -24,12 +24,13 @@ class VirtueleTestBase(TestCase):
                                              is_active=True)
 
     def account_factory(self, n=3):
-        for i in range(1, n):
-            get_user_model().objects.create_user(email=f'user{i}@user.com',
-                                                 password=f'user{i}',
+        users_count = get_user_model().objects.all().count() + 1
+        for i in range(0, n):
+            get_user_model().objects.create_user(email=f'user{i+users_count}@user.com',
+                                                 password=f'user{i+users_count}',
                                                  first_name='user',
-                                                 last_name={i},
-                                                 username=f'USER{i}',
+                                                 last_name={i+1},
+                                                 username=f'USER{i+users_count}',
                                                  is_active=True)
 
     def product_factory(self, n=5, category: list=None, with_reviews=False):
@@ -76,11 +77,16 @@ class VirtueleTestBase(TestCase):
     @property
     def admin_jwt(self):
         user = get_user_model().objects.get(username='adminGod')
-        refresh = RefreshToken.for_user(user)
-        return {'HTTP_AUTHORIZATION':f'JWT {refresh.access_token}'}
+        token = RefreshToken.for_user(user)
+        return {'HTTP_AUTHORIZATION':f'JWT {token.access_token}'}
 
     @property
     def user_jwt(self):
         user = get_user_model().objects.get(username='punyUser')
-        refresh = RefreshToken.for_user(user)
-        return {'HTTP_AUTHORIZATION':f'JWT {refresh.access_token}'}
+        token = RefreshToken.for_user(user)
+        return {'HTTP_AUTHORIZATION':f'JWT {token.access_token}'}
+
+    def account_jwt(self, id):
+        user = get_user_model().objects.get(id=id)
+        token = RefreshToken.for_user(user)
+        return {'HTTP_AUTHORIZATION':f'JWT {token.access_token}'}
