@@ -54,7 +54,7 @@ class Product(models.Model):
 
 @receiver(models.signals.post_save, sender=Product)
 def product_post_save(sender, instance, created, **kwargs):
-    product_carts = instance.product_cart.filter(checked_out=False)
+    product_carts = instance.product_cart.filter(product=instance, cart__checked_out=False)
     if product_carts.exists():
         for product_cart in product_carts:
             product_cart.save()

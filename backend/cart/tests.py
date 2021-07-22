@@ -72,3 +72,16 @@ class CartCRUD(VirtueleTestBase):
 
         response = self.client.delete(f'/api/v1/carts/items/{product.slug}/S/', **self.account_jwt(1))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_toggle_item_selected_status(self):
+        product = Product.objects.get(id=1)
+
+        # By default all newly created product cart will have its selected set to true
+        response = self.client.post(f'/api/v1/carts/items/{product.slug}/S/', **self.account_jwt(1))
+        self.assertEqual(response.data['products'][0]['selected'], True)
+
+        response = self.client.post(f'/api/v1/carts/toggle/items/{product.slug}/S/', **self.account_jwt(1))
+        self.assertEqual(response.data['products'][0]['selected'], False)
+
+        response = self.client.post(f'/api/v1/carts/toggle/items/{product.slug}/S/', **self.account_jwt(1))
+        self.assertEqual(response.data['products'][0]['selected'], True)
