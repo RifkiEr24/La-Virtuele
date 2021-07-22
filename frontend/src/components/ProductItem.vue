@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div class="product-card" >
     <div class="img-card relative ">
       <div class="content-details fadeIn-top z-10">
         <button @click="$router.push({name: 'details', params: { id: slugProduct },})" class="bg-white text-3xl p-2 rounded-lg mx-2">
@@ -11,7 +11,7 @@
         </button>
       </div>
       <div class="img-overlay bg-secondary h-full absolute w-full "></div>
-              <img :src="`https://la-virtuele.harizmunawar.repl.co${imageProduct}`|| 'default.jpg'" class="w-full " >
+              <img :src="`https://la-virtuele.harizmunawar.repl.co${imageProduct}`|| 'default.jpg'" class="w-full img-product" >
 
     </div>
 
@@ -45,9 +45,6 @@ props:{
     },
 },
 methods:{
-    getImgUrl(pic) {
-    return require('../assets/img/'+pic)
-}
 }
 }
 </script>
@@ -104,5 +101,9 @@ methods:{
 .shape-identify#new-arrival-button {
   left: 100%;
   transform: translateX(-100%);
+}
+.img-product{
+  height: 400px;
+  object-fit: cover;
 }
 </style>

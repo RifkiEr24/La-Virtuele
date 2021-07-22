@@ -53,7 +53,7 @@
 
         <div class=" mt-10 text-center" v-show="featured">
           <div class="flex  flex-wrap  -mx-2">
-            <div class="w-6/12 md:w-3/12  px-2" v-for="item in productlist" :key="item.id">
+            <div class="w-6/12 md:w-3/12  px-2" v-for="item in featuredProduct" :key="item.id">
               <product-item :slug-product="item.slug" :image-product="item.model[0].image || 'a'" :name-product="item.name"
                 :price-product="`Rp ${item.price}`" />
             </div>
@@ -67,8 +67,8 @@
       <fade-transition>
            <div class=" mt-10 text-center" v-show="featured == false">
           <div class="flex  flex-wrap  -mx-2">
-            <div class="w-6/12 md:w-3/12  px-2" v-for="item in productlist" :key="item.id">
-              <product-item :slug-product="item.slug" :image-product="item.model[0].image || 'a'" :name-product="item.product"
+            <div class="w-6/12 md:w-3/12  px-2" v-for="item in featuredProduct" :key="item.id">
+              <product-item :slug-product="item.slug" :image-product="item.model[0].image" :name-product="item.product"
                 :price-product="`Rp ${item.price}`" />
             </div>
           </div>
@@ -83,18 +83,24 @@
 
 <script>
 // @ is an alias to /src
-import { FadeTransition } from 'vue2-transitions'
+import {
+  FadeTransition
+} from 'vue2-transitions'
+import {
+  mapActions,
+  mapState
+} from 'vuex';
 import PrimaryButton from '@/components/PrimaryButton.vue'
 import HeroCarousel from '@/components/HeroCarousel.vue'
 import ProductItem from '@/components/ProductItem.vue';
 export default {
   name: 'Home',
-  data(){
-    return{
-      productlist:[],
+  data() {
+    return {
+      productlist: [],
       featured: true,
       show: true,
-      idIdentifier:"featured-button",
+      idIdentifier: "featured-button",
     }
   },
   components: {
@@ -103,35 +109,30 @@ export default {
     HeroCarousel,
     ProductItem
   },
-  created(){
-      this.axios.get('https://la-virtuele.harizmunawar.repl.co/api/v1/products/').then((response) => {
-        this.productlist=response.data;
-        console.log(this.productlist[0].slug);
-        this.productlist.forEach(element => {
-          if(element.model[0] == undefined ){
-            element.model.push(element.gallery[0]);
-          }
-        });
-      })
+  mounted() {
+    this.fetchFeaturedProduct();
+  },
+  computed: {
+    ...mapState(['featuredProduct'])
   },
   methods: {
-    toogle(){
-				this.featured = !this.featured;
-			},
-      showFeatured: function (event){
-                this.featured = true;
-        this.$refs.identifier.id=event.target.classList[0];
-        this.$refs.featured.classList.add('text-white');    
-        this.$refs.newarrival.classList.remove('text-white');    
-      },
-        showNew: function (event){
-                        this.featured = false;   
+    ...mapActions(["fetchFeaturedProduct"]),
+    toogle() {
+      this.featured = !this.featured;
+    },
+    showFeatured: function (event) {
+      this.featured = true;
+      this.$refs.identifier.id = event.target.classList[0];
+      this.$refs.featured.classList.add('text-white');
+      this.$refs.newarrival.classList.remove('text-white');
+    },
+    showNew: function (event) {
+      this.featured = false;
+      this.$refs.identifier.id = event.target.classList[0];
+      this.$refs.newarrival.classList.add('text-white');
+      this.$refs.featured.classList.remove('text-white');
 
-              this.$refs.identifier.id=event.target.classList[0];
-             this.$refs.newarrival.classList.add('text-white');
-              this.$refs.featured.classList.remove('text-white'); 
-          
-      }
+    }
   }
 };
 </script>
