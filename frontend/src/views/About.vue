@@ -4,53 +4,7 @@
       <div class="w-3/12">
         <h2 class="header text-2xl">Filter</h2>
         <bordered-heading class="mt-5" :headingText="'Categories'"/>
-        <label class="container my-3">S
-            <input type="radio" name="size-select" checked="checked">
-            <span class="checkmark"></span>
-          </label>
-             <label class="container my-3">S
-            <input type="radio" name="size-select" checked="checked">
-            <span class="checkmark"></span>
-          </label>
-             <label class="container my-3">S
-            <input type="radio" name="size-select" checked="checked">
-            <span class="checkmark"></span>
-          </label>
-             <label class="container my-3">S
-            <input type="radio" name="size-select" checked="checked">
-            <span class="checkmark"></span>
-          </label>
-           <bordered-heading class="mt-5" :headingText="'Categories'"/>
-        <label class="container my-3">S
-            <input type="radio" name="size-select" checked="checked">
-            <span class="checkmark"></span>
-          </label>
-             <label class="container my-3">S
-            <input type="radio" name="size-select" checked="checked">
-            <span class="checkmark"></span>
-          </label>
-             <label class="container my-3">S
-            <input type="radio" name="size-select" checked="checked">
-            <span class="checkmark"></span>
-          </label>
-             <label class="container my-3">S
-            <input type="radio" name="size-select" checked="checked">
-            <span class="checkmark"></span>
-          </label>
-           <bordered-heading class="mt-5" :headingText="'Categories'"/>
-        <label class="container my-3">S
-            <input type="radio" name="size-select" checked="checked">
-            <span class="checkmark"></span>
-          </label>
-             <label class="container my-3">S
-            <input type="radio" name="size-select" checked="checked">
-            <span class="checkmark"></span>
-          </label>
-             <label class="container my-3">S
-            <input type="radio" name="size-select" checked="checked">
-            <span class="checkmark"></span>
-          </label>
-             <label class="container my-3">S
+        <label class="container my-3" v-for="category in categoryList" :key="category.id">{{category.name}}
             <input type="radio" name="size-select" checked="checked">
             <span class="checkmark"></span>
           </label>
@@ -67,6 +21,7 @@
 <script>
 import BorderedHeading from '../components/BorderedHeading.vue'
 import ProductItem from '../components/ProductItem.vue'
+import {mapActions, mapState} from 'vuex';
 
 export default {
   components: {
@@ -79,6 +34,16 @@ export default {
       productlist:[],
     }
    },
+   methods:{
+    ...mapActions(['fetchCategoryList']),
+
+   },
+     computed : {
+    ...mapState(['categoryList'])
+  },
+  mounted(){
+    this.fetchCategoryList()
+  },
      created(){
       this.axios.get('https://la-virtuele.harizmunawar.repl.co/api/v1/products/').then((response) => {
         this.productlist=response.data;
