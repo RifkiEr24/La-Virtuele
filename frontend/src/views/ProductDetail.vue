@@ -8,24 +8,19 @@
         <p class="text-primary  text-xl font-semibold">Rp {{product.price}}</p>
         <div class="info mt-20">
           <h2 class="text-3xl font-bold header  tracking-wide">Info</h2>
-          <p class="mt-2 ">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-            nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-            irure dolor in</p>
+          <p class="mt-2 ">{{product.description}}</p>
         </div>
       </div>
       <div class="w-full md:w-4/12 px-2 order-1 md:order-2">
-        <VueSlickCarousel ref="c1" :asNavFor="$refs.c2" :slidesToShow="1">
+        <VueSlickCarousel v-if="product.gallery" ref="c1" :asNavFor="$refs.c2" :slidesToShow="1">
           <div v-for="image in product.gallery" :key="image.id">
             <inner-image-zoom :src="`https://la-virtuele.harizmunawar.repl.co${image.image}`"
               :zoomSrc="`https://la-virtuele.harizmunawar.repl.co${image.image}`" :zoomScale="0.1"
              />
           </div>
-
-
         </VueSlickCarousel>
 
-        <VueSlickCarousel ref="c2" :asNavFor="$refs.c1" :slidesToShow="3" :focusOnSelect="true"
+        <VueSlickCarousel  v-if="product.gallery" ref="c2" :asNavFor="$refs.c1" :slidesToShow="3" :focusOnSelect="true"
           :draggable="false">
           <div v-for="image in product.gallery" :key="image.id">
             <img class="img-navigation"
