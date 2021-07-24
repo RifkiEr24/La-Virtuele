@@ -82,21 +82,17 @@ class CartItem(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        product_cart, created = ProductCart.objects.get_or_create(user=request.user, product=product, checked_out=False, size=size.upper())
-        cart_qs = Cart.objects.filter(user=request.user, checked_out=False)
+        product_cart, product_created = ProductCart.objects.get_or_create(
+            user=request.user,
+            product=product,
+            size=size.upper(),
+            defaults={'selected': True})
 
-        if cart_qs.exists():
-            cart = cart_qs[0]
-            if cart.products.filter(product__slug=product.slug, size=size).exists():
-                product_cart.qty += 1
-                product_cart.save()
-            else:
-                cart.products.add(product_cart)
-        else:
-            cart = Cart.objects.create(user=request.user)
-            cart.products.add(product_cart)
-        cart.save()
-        serializer = CartSerializer(cart)
+        if not product_created:
+            product_cart.qty += 1
+            product_cart.save()
+
+        serializer = CartSerializer(Cart.objects.get(user=request.user, checked_out=False))
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -123,7 +119,7 @@ class CartItem(APIView):
         try:
             cart = Cart.objects.get(user=user, checked_out=False)
             if size.upper() not in ['S', 'M', 'L']: raise ValueError
-            product_cart = ProductCart.objects.get(product__slug=slug, user=user, size=size, checked_out=False)
+            product_cart = ProductCart.objects.get(product__slug=slug, size=size, cart=cart)
         except (Cart.DoesNotExist, ProductCart.DoesNotExist) as e:
             if e == Cart.DoesNotExist:
                 Cart.objects.create(user=user)
@@ -145,12 +141,58 @@ class CartItem(APIView):
             product_cart.qty -= 1
             product_cart.save()
         else:
-            cart.products.remove(product_cart)
             product_cart.delete()
-            cart.save()
 
-        serialize = CartSerializer(cart)
-        return Response(serialize.data)
+        serializer = CartSerializer(Cart.objects.get(user=user, checked_out=False))
+        return Response(serializer.data)
+
+class ToggleCartItem(APIView):
+    permission_classes = [IsActive]
+
+    @swagger_auto_schema(
+        responses={
+            200: CartSerializer(),
+            400: 'Invalid Size Parameter',
+            404: 'Can\'t Find Product With That Slug'
+        }
+    )
+    def post(self, request, slug, size):
+        """
+        Toggle Item Selected Status From Cart
+
+        Toggle mentioned product selected status from its active cart.
+        If the product is unselected it will be selected and vice versa.
+        
+        Allowed size parameters value are: 'S', 'M', 'L' either upper or lowercase
+        """
+        user = request.user
+
+        try:
+            cart = Cart.objects.get(user=user, checked_out=False)
+            if size.upper() not in ['S', 'M', 'L']: raise ValueError
+            product_cart = ProductCart.objects.get(product__slug=slug, size=size, cart=cart)
+        except (Cart.DoesNotExist, ProductCart.DoesNotExist) as e:
+            if e == Cart.DoesNotExist:
+                Cart.objects.create(user=user)
+            return Response(
+                {
+                    'detail': f'Trying to toggle selected status of non existing product from {user.username} cart'
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except ValueError:
+            return Response(
+                {
+                    'details': 'Size parameter only accept S, M, or L either uppercase or lowercase'
+                }, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        product_cart.selected = not product_cart.selected
+        product_cart.save()
+
+        serializer = CartSerializer(Cart.objects.get(user=user, checked_out=False))
+        return Response(serializer.data)
 
 class Checkout(APIView):
     """

@@ -4,6 +4,7 @@ from django.urls.conf import include
 from product import urls as prod_urls
 from user import urls as user_urls
 from cart import urls as cart_urls
+from payments import urls as payment_urls
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework import permissions
@@ -30,6 +31,7 @@ urlpatterns = [
         path('', include(prod_urls.urlpatterns), name='product'),
         path('', include(user_urls.urlpatterns), name='user'),
         path('', include(cart_urls.urlpatterns), name='cart'),
+        path('', include(payment_urls.urlpatterns), name='payments')
     ]), name='api'),
 ]
 

@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'product',
     'cart',
     'user',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -203,3 +204,16 @@ EMAIL_PORT = config('EMAIL_PORT', cast=int, default='')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default=True)
+
+if DEBUG:
+    MIDTRANS = {
+        'MERCHANT_ID': config('MIDTRANS_MERCHANT_ID', cast=str),
+        'SERVER_KEY': config('SBMIDTRANS_SERVER_KEY', cast=str),
+        'CLIENT_KEY': config('SBMIDTRANS_CLIENT_KEY', cast=str),
+    }
+else:
+    MIDTRANS = {
+        'MERCHANT_ID': config('MIDTRANS_MERCHANT_ID', cast=str),
+        'SERVER_KEY': config('MIDTRANS_SERVER_KEY', cast=str),
+        'CLIENT_KEY': config('MIDTRANS_CLIENT_KEY', cast=str),
+    }
