@@ -1,5 +1,5 @@
 from django.contrib import admin
-from cart.models import Cart, ProductCart
+from cart.models import Cart, ProductCart, Transaction
 
 @admin.register(ProductCart)
 class ProductCartAdmin(admin.ModelAdmin):
@@ -8,3 +8,7 @@ class ProductCartAdmin(admin.ModelAdmin):
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
     readonly_fields = ('total',)
+
+@admin.register(Transaction)
+class OrderHistoryAdmin(admin.ModelAdmin):
+    pass
