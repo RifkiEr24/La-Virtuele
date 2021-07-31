@@ -67,10 +67,10 @@ class GopayTest(VirtueleTestBase):
         response = self.client.post(f'/api/v1/payments/gopay/{order_id}/cancel/', **self.user_jwt)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['transaction_status'], 'cancel')
-        self.assertEqual(Transaction.objects.get(order_id=order_id).transaction_status, 'cancel')
+        self.assertEqual(Transaction.objects.get(order_id=order_id).status, 'cancel')
 
         order_id = self.create_new_transaction()
         response = self.client.post(f'/api/v1/payments/gopay/{order_id}/cancel/', **self.admin_jwt)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['transaction_status'], 'cancel')
-        self.assertEqual(Transaction.objects.get(order_id=order_id).transaction_status, 'cancel')
+        self.assertEqual(Transaction.objects.get(order_id=order_id).status, 'cancel')

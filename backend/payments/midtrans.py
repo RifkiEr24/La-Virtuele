@@ -65,23 +65,22 @@ class PaymentAPI(APIView):
             cart=cart,
             order_id=midtrans_response['order_id'],
             defaults={
-                'transaction_status': midtrans_response['transaction_status']
+                'status': midtrans_response['transaction_status']
             }
         )
 
         return order
 
-    def handle_notification(self, notification):
+    def handle_notification(self, status):
+        notification = midtrans.transactions.notification(status)
         order_id = notification['order_id']
         transaction_status = notification['transaction_status']
         fraud_status = notification['fraud_status']
 
-        print('Transaction notification received. Order ID: {0}. Transaction status: {1}. Fraud status: {2}'.format(order_id,
-                transaction_status,
-                fraud_status))
+        print(f'Transaction notification received. Order ID: {order_id}. Transaction status: {transaction_status}. Fraud status: {fraud_status}')
 
         transaction = Transaction.objects.get(order_id=order_id)
-        transaction.transaction_status = transaction_status
+        transaction.status = transaction_status
         transaction.save()
         
         if transaction_status == 'capture':
