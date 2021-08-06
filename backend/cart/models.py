@@ -16,17 +16,34 @@ class Cart(models.Model):
     def save(self, *args, **kwargs):
         return super(Cart, self).save(*args, **kwargs)
 
-    def update_total(self, product_list):
-        total = 0
-        for product in product_list:
-            total += product.subtotal
-        self.total = total
-
-        return self.save()
-
     def toggle_checkout(self):
         self.checked_out = not self.checked_out
 
+        return self.save()
+
+    def get_selected_product(self):
+        selected_product = []
+
+        for product in ProductCart.objects.filter(cart__id=self.id, selected=True):
+            selected_product.append({
+                'name': product.product.name,
+                'description': product.product.description,
+                'size': product.size,
+                'price': product.product.price,
+                'quantity': product.qty,
+                'subtotal': product.subtotal,
+            })
+        
+        return selected_product
+
+    def update_total(self):
+        product_list = self.get_selected_product()
+        total = 0
+
+        for product in product_list:
+            total += product['subtotal']
+
+        self.total = total
         return self.save()
 
 @receiver(models.signals.pre_save, sender=Cart)
@@ -79,11 +96,11 @@ def product_cart_post_save(sender, instance, created, **kwargs):
         instance.save()
 
     # Update cart total
-    instance.cart.update_total(ProductCart.objects.filter(cart=instance.cart, selected=True))
+    instance.cart.update_total()
 
 @receiver(models.signals.post_delete, sender=ProductCart)
 def product_cart_post_delete(sender, instance, **kwargs):
-    instance.cart.update_total(ProductCart.objects.filter(cart=instance.cart, selected=True))
+    instance.cart.update_total()
 
 class Transaction(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='transaction')

@@ -18,7 +18,7 @@ midtrans = CoreApi(
 )
 
 midtrans.api_config.custom_headers = {
-    'x-override-notification':'http://127.0.0.1:8000'
+    'x-override-notification':'http://127.0.0.1:8000/api/v1/payments/notifications/'
 }
 
 class PaymentAPI(APIView):
@@ -26,21 +26,6 @@ class PaymentAPI(APIView):
 
     def get_users_active_cart(self, request):
         return Cart.objects.get_or_create(user=request.user, checked_out=False)[0]
-
-    def get_selected_product_cart(self, cart):
-        selected_product = []
-
-        for product in ProductCart.objects.filter(cart=cart, selected=True):
-            selected_product.append({
-                'name': product.product.name,
-                'description': product.product.description,
-                'size': product.size,
-                'price': product.product.price,
-                'quantity': product.qty,
-                'subtotal': product.subtotal,
-            })
-        
-        return selected_product
 
     def tokenize_todays_date(self):
         tup_date = date.timetuple(date.today())
@@ -77,8 +62,6 @@ class PaymentAPI(APIView):
         transaction_status = notification['transaction_status']
         fraud_status = notification['fraud_status']
 
-        print(f'Transaction notification received. Order ID: {order_id}. Transaction status: {transaction_status}. Fraud status: {fraud_status}')
-
         transaction = Transaction.objects.get(order_id=order_id)
         transaction.status = transaction_status
         transaction.save()
@@ -102,19 +85,19 @@ class GopayTransaction(PaymentAPI):
         cart = self.get_users_active_cart(request)
 
         param = {
-            "payment_type": "gopay",
-            "transaction_details": {
+            'payment_type': 'gopay',
+            'transaction_details': {
                 'order_id': 'GOPAY-'+self.generate_order_id(request),
-                "gross_amount": cart.total
+                'gross_amount': cart.total
             },
-            "item_details": self.get_selected_product_cart(cart),
-            "customer_details": {
-                "first_name": request.user.first_name,
-                "last_name": request.user.last_name,
-                "email": request.user.email,
+            'item_details': cart.get_selected_product(),
+            'customer_details': {
+                'first_name': request.user.first_name,
+                'last_name': request.user.last_name,
+                'email': request.user.email,
             },
-            "gopay": {
-                "enable_callback": False,
+            'gopay': {
+                'enable_callback': False,
             }
         }
 
