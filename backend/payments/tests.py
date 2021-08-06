@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from product.models import Product
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -78,14 +77,12 @@ class GopayTest(VirtueleTestBase):
         response = self.client.post(f'/api/v1/payments/gopay/{order_id}/cancel/', **self.user_jwt)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['transaction_status'], 'cancel')
-        self.assertEqual(Transaction.objects.get(order_id=order_id).status, 'cancel')
 
         order_id = self.test_create_new_transaction()
         response = self.client.post(f'/api/v1/payments/gopay/{order_id}/cancel/', **self.admin_jwt)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['transaction_status'], 'cancel')
-        self.assertEqual(Transaction.objects.get(order_id=order_id).status, 'cancel')
-
+    
     def test_ing_for_gopay_qr(self):
         self.add_product_to_users_cart(self.user_jwt)
         response = self.client.post('/api/v1/payments/gopay/charge/', **self.user_jwt)

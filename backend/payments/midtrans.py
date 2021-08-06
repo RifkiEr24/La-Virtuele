@@ -18,7 +18,7 @@ midtrans = CoreApi(
 )
 
 midtrans.api_config.custom_headers = {
-    'x-override-notification':'http://127.0.0.1:8000/api/v1/payments/notifications/'
+    'x-override-notification':'https://03cd47b14d4a.ngrok.io/api/v1/payments/notifications/'
 }
 
 class PaymentAPI(APIView):
@@ -55,30 +55,6 @@ class PaymentAPI(APIView):
         )
 
         return order
-
-    def handle_notification(self, status):
-        notification = midtrans.transactions.notification(status)
-        order_id = notification['order_id']
-        transaction_status = notification['transaction_status']
-        fraud_status = notification['fraud_status']
-
-        transaction = Transaction.objects.get(order_id=order_id)
-        transaction.status = transaction_status
-        transaction.save()
-        
-        if transaction_status == 'capture':
-            if fraud_status == 'challenge':
-                # TODO set transaction status on your databaase to 'challenge'
-                None
-            elif fraud_status == 'accept':
-                # TODO set transaction status on your databaase to 'success'
-                None
-        elif transaction_status == 'cancel' or transaction_status == 'deny' or transaction_status == 'expire':
-            # TODO set transaction status on your databaase to 'failure'
-            None
-        elif transaction_status == 'pending':
-            # TODO set transaction status on your databaase to 'pending' / waiting payment
-            None
 
 class GopayTransaction(PaymentAPI):
     def post(self, request):
@@ -119,7 +95,6 @@ class CheckGopayTransactionStatus(PaymentAPI):
 
             response = midtrans.transactions.status(order_id)
             response['status_code'] = '200'
-            self.handle_notification(response)
             return Response(response, status=response['status_code'])
         except MidtransAPIError as e:
             return Response(e.api_response_dict, status=e.api_response_dict['status_code'])
@@ -133,7 +108,6 @@ class CancelGopayTransaction(PaymentAPI):
                 return Response({'message': 'You do not have permission to view this transaction status'}, 403)
 
             response = midtrans.transactions.cancel(order_id)
-            self.handle_notification(response)
             return Response(response, status=response['status_code'])
         except MidtransAPIError as e:
             return Response(e.api_response_dict, status=e.api_response_dict['status_code'])
