@@ -1,6 +1,9 @@
 <template>
     <nav  v-scroll="updateScroll" :class="{'md:bg-secondary': scrollPosition > 20}" class="flex-row block md:flex fixed  z-50 transition duration-500 mx-auto md:justify-between  w-full  h-12 bg-secondary md:bg-transparent py-0 uppercase ">
-        <div class="flex flex-row w-full md:w-5/12 justify-between px-4 " :class="{ 'text-white': $route.path === '/' ||  scrollPosition > 20  }">
+      <modal name="my-first-modal">
+        This is my first modal
+    </modal>
+      <div class="flex flex-row w-full md:w-5/12 justify-between px-4 " :class="{ 'text-white': $route.path === '/' ||  scrollPosition > 20  }">
            <a href="#" class="p-2  text-3xl header">La.virtuele</a>
 
            <svg class="text-white w-8 text-sm md:hidden accesibillity-size"  id="hamburgerbtn" @click="active" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -40,6 +43,8 @@
     </nav>
 </template>
 <script>
+import Login from './Login.vue'
+
 export default {
   name: 'Navbar',
   data(){
@@ -58,6 +63,11 @@ export default {
     
   },
   mounted(){
+            this.$modal.show(
+  Login,
+
+)
+
         window.addEventListener('scroll', this.updateScroll);
 
   }
