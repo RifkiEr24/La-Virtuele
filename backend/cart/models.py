@@ -11,17 +11,39 @@ class Cart(models.Model):
     total = models.PositiveIntegerField(null=True, blank=True, default=0)
 
     def __str__(self, *args, **kwargs):
-        return f'{self.user} {self.total}'
+        return f'{self.user}-{self.id}-{self.total}'
 
     def save(self, *args, **kwargs):
         return super(Cart, self).save(*args, **kwargs)
 
-    def update_total(self, product_list):
-        total = 0
-        for product in product_list:
-            total += product.subtotal
-        self.total = total
+    def toggle_checkout(self):
+        self.checked_out = not self.checked_out
 
+        return self.save()
+
+    def get_selected_product(self):
+        selected_product = []
+
+        for product in ProductCart.objects.filter(cart__id=self.id, selected=True):
+            selected_product.append({
+                'name': product.product.name,
+                'description': product.product.description,
+                'size': product.size,
+                'price': product.product.price,
+                'quantity': product.qty,
+                'subtotal': product.subtotal,
+            })
+        
+        return selected_product
+
+    def update_total(self):
+        product_list = self.get_selected_product()
+        total = 0
+
+        for product in product_list:
+            total += product['subtotal']
+
+        self.total = total
         return self.save()
 
 @receiver(models.signals.pre_save, sender=Cart)
@@ -29,7 +51,7 @@ def cart_pre_save(sender, instance, **kwargs):
     # There can only be one active (uncheckedout) cart
     try:
         cart = Cart.objects.filter(user=instance.user, checked_out=False)
-        if cart and instance not in cart: raise IntegrityError('This user already have an active cart')
+        if cart.count() > 1: raise IntegrityError('This user already have an active cart')
     except Cart.DoesNotExist:
         pass
 
@@ -37,7 +59,7 @@ def cart_pre_save(sender, instance, **kwargs):
 def cart_post_save(sender, instance, created, **kwargs):
     # Create a new cart for each product that are not selected during checkout
     if instance.checked_out and not created:
-        unselected_product = [product.id for product in instance.products if not product.selected]
+        unselected_product = [product.id for product in instance.product_cart.all() if not product.selected]
             
         if unselected_product:
             new_cart = Cart.objects.create(user=instance.user, checked_out=False)
@@ -74,8 +96,17 @@ def product_cart_post_save(sender, instance, created, **kwargs):
         instance.save()
 
     # Update cart total
-    instance.cart.update_total(ProductCart.objects.filter(cart=instance.cart, selected=True))
+    instance.cart.update_total()
 
 @receiver(models.signals.post_delete, sender=ProductCart)
 def product_cart_post_delete(sender, instance, **kwargs):
-    instance.cart.update_total(ProductCart.objects.filter(cart=instance.cart, selected=True))
+    instance.cart.update_total()
+
+class Transaction(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='transaction')
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='transaction')
+    order_id = models.CharField(max_length=255, unique=True)
+    status = models.CharField(max_length=255)
+    
+    def __str__(self):
+        return f'{self.user.username}-{self.order_id}'

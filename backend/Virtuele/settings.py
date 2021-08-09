@@ -11,7 +11,7 @@ SECRET_KEY = config('SECRET_KEY', default='changemeonproduction')
 
 DEBUG = bool(int(os.environ.get('DEBUG', 1)))
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv()) if not DEBUG else []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv()) if not DEBUG else ['*']
 
 
 INSTALLED_APPS = [
