@@ -1,13 +1,13 @@
 <template>
   <VueSlickCarousel :arrows="true" :dots="false">
     <div>
-      <img src="@/assets/img/1.png" alt="">
+      <img src="@/assets/img/1.png"  class="w-full" alt="">
     </div>
-    <div> <img src="@/assets/img/2.png" alt=""></div>
-    <div> <img src="@/assets/img/3.png" alt=""></div>
-    <div> <img src="@/assets/img/4.png" alt=""></div>
-    <div> <img src="@/assets/img/5.png" alt=""></div>
-    <div> <img src="@/assets/img/6.png" alt=""></div>
+    <div> <img src="@/assets/img/2.png"  class="w-full" alt=""></div>
+    <div> <img src="@/assets/img/3.png"  class="w-full" alt=""></div>
+    <div> <img src="@/assets/img/4.png"  class="w-full" alt=""></div>
+    <div> <img src="@/assets/img/5.png"  class="w-full" alt=""></div>
+    <div> <img src="@/assets/img/6.png"  class="w-full" alt=""></div>
 
     <template #prevArrow>
       <button class="right-bot prev">

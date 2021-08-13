@@ -7,7 +7,7 @@ import './assets/css/tailwind.css';
 import VuePageTransition from 'vue-page-transition'
 import Transitions from 'vue2-transitions'
 import VueAxios from 'vue-axios';
-
+import VModal from 'vue-js-modal'
 import axios from 'axios'
 
 import 'vue-slick-carousel/dist/vue-slick-carousel.css'
@@ -27,6 +27,7 @@ Vue.directive('scroll', {
     window.addEventListener('scroll', f)
   }
 })
+Vue.use(VModal)
 
 Vue.use(Transitions)
 Vue.use(VuePageTransition)
