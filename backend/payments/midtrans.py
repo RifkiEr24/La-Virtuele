@@ -1,5 +1,6 @@
 from datetime import date
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from midtransclient import CoreApi
@@ -23,6 +24,10 @@ midtrans.api_config.custom_headers = {
 
 class PaymentAPI(APIView):
     permission_classes = [IsActive]
+    PAYMENT_TYPE = [
+        'gopay',
+        'cstore'
+    ]
 
     def get_users_active_cart(self, request):
         return Cart.objects.get_or_create(user=request.user, checked_out=False)[0]
@@ -44,6 +49,39 @@ class PaymentAPI(APIView):
 
         return order_id
 
+    def build_transaction_param(self, request, payment_type: str, cart: Cart, **kwargs):
+        if not payment_type.lower() in self.PAYMENT_TYPE:
+            raise ValueError
+        
+        transaction = dict()
+        transaction['payment_type'] = payment_type
+
+        if payment_type == 'cstore':
+            store = kwargs['store']
+            transaction['cstore'] = {
+                'store': store,
+                'message': 'Terimakasih sudah berbelanja',
+                'alfamart_free_text': 'Terimakasih sudah berbelanja'
+            }
+        
+        if payment_type == 'gopay':
+            transaction['gopay'] = {
+                'enable_callback': True
+            }
+
+        transaction['transaction_details'] = {
+            'gross_amount': cart.total,
+            'order_id': payment_type.upper()+'-'+self.generate_order_id(request)
+        }
+        transaction['customer_details'] = {
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'email': request.user.email,
+        }
+        transaction['item_details'] = cart.get_selected_product()
+
+        return transaction
+
     def save_transaction_to_local_database(self, user, cart, midtrans_response):
         order = Transaction.objects.get_or_create(
             user=user,
@@ -56,36 +94,7 @@ class PaymentAPI(APIView):
 
         return order
 
-class GopayTransaction(PaymentAPI):
-    def post(self, request):
-        cart = self.get_users_active_cart(request)
-
-        param = {
-            'payment_type': 'gopay',
-            'transaction_details': {
-                'order_id': 'GOPAY-'+self.generate_order_id(request),
-                'gross_amount': cart.total
-            },
-            'item_details': cart.get_selected_product(),
-            'customer_details': {
-                'first_name': request.user.first_name,
-                'last_name': request.user.last_name,
-                'email': request.user.email,
-            },
-            'gopay': {
-                'enable_callback': False,
-            }
-        }
-
-        try:
-            response = midtrans.charge(param)
-            cart.toggle_checkout()
-            self.save_transaction_to_local_database(request.user, cart, response)
-            return Response(response, status=response['status_code'])
-        except MidtransAPIError as e:
-            return Response(e.api_response_dict, status=e.api_response_dict['status_code'])
-
-class CheckGopayTransactionStatus(PaymentAPI):
+class CheckTransactionStatus(PaymentAPI):
     def get(self, request, order_id):
         try:
             transaction = get_object_or_404(Transaction, order_id=order_id)
@@ -99,7 +108,7 @@ class CheckGopayTransactionStatus(PaymentAPI):
         except MidtransAPIError as e:
             return Response(e.api_response_dict, status=e.api_response_dict['status_code'])
 
-class CancelGopayTransaction(PaymentAPI):
+class CancelTransaction(PaymentAPI):
     def post(self, request, order_id):
         try:
             transaction = get_object_or_404(Transaction, order_id=order_id)
